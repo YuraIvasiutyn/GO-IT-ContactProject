@@ -20,26 +20,22 @@
         <th scope="col">Email</th>
         <th scope="col">Phone</th>
         <th scope="col">Birthday</th>
-        <th scope="col">Actions</th>
+        <th class="text-center "  style="width: 150px;"  scope="col">Actions</th>
     </tr>
     </thead>
     <tbody>
     {% for contact in contacts %}
-    <tr >
+    <tr>
         <td class="fw-bold" title="{{ contact.full_name }}">{{ contact.full_name }}</td>
         <td class="fw-bold" title="{{ contact.address }}">{{ contact.address }}</td>
         <td class="fw-bold" title="{{ contact.email }}">{{ contact.email }}</td>
         <td class="fw-bold" title="{{ contact.phone }}">{{ contact.phone }}</td>
         <td class="fw-bold" title="{{ contact.birthday }}">{{ contact.birthday }}</td>
-        <td>
-            <a href="{% url 'contact_app:edit_contact' contact.pk %}"
-               class="btn btn-sm btn-primary">Edit</a>
-            <a href="{% url 'contact_app:delete_confirm' contact.pk %}" class="btn btn-sm btn-danger">
-                Delete
-            </a>
+        <td class="text-center "  style="width: 140px;">
+            <a href="{% url 'contact_app:edit_contact' contact.pk %}" class="btn btn-sm btn-primary">Edit</a>
+            <a href="{% url 'contact_app:delete_confirm' contact.pk %}" class="btn btn-sm btn-danger">Delete</a>
         </td>
-    </tr>
-    {% endfor %}
+        {% endfor %}
     </tbody>
 </table>
 <ul class="pagination justify-content-center">

@@ -19,7 +19,7 @@ def main(request):
             Q(email__icontains=q) |
             Q(phone__icontains=q)
         )
-    paginator = Paginator(contacts, 1)
+    paginator = Paginator(contacts, 10)
     page_number = request.GET.get("page")
     contacts = paginator.get_page(page_number)
 
