@@ -1,7 +1,7 @@
 {% extends "contact_app/base.html" %}
 {% block content %}
 
-    <h2>Confirm Deletion</h2>
+<h1 class="text-center">{{ title }}</h1>
     <p>Are you sure you want to delete <strong>{{ contact.full_name }}</strong>?</p>
     <form method="post" action="{% url 'contact_app:delete_confirm' contact.pk %}"
           class="d-flex jastify-content-center gap-2 ">
