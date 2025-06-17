@@ -1,0 +1,72 @@
+{% extends "contact_app/base.html" %}
+
+{% block content %}
+
+<h1 class="text-center">{{ title }}</h1>
+<hr>
+<form action="{% url 'contact_app:main' %}" method="get" class="d-flex justify-content-end">
+    <div class="input-group mb-3" style="max-width: 400px; width: 100%;">
+        {{ form.q }}
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+        <a href="{% url 'contact_app:main' %}" class="btn btn-outline-danger">Clear</a>
+    </div>
+</form>
+<hr>
+<table class="table table-hover w-100">
+    <thead>
+    <tr class="table-primary ">
+        <th scope="col">Full name</th>
+        <th scope="col">Address</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Birthday</th>
+        <th class="text-center "  style="width: 150px;"  scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for contact in contacts %}
+    <tr>
+        <td class="fw-bold" title="{{ contact.full_name }}">{{ contact.full_name }}</td>
+        <td class="fw-bold" title="{{ contact.address }}">{{ contact.address }}</td>
+        <td class="fw-bold" title="{{ contact.email }}">{{ contact.email }}</td>
+        <td class="fw-bold" title="{{ contact.phone }}">{{ contact.phone }}</td>
+        <td class="fw-bold" title="{{ contact.birthday }}">{{ contact.birthday }}</td>
+        <td class="text-center "  style="width: 140px;">
+            <a href="{% url 'contact_app:edit_contact' contact.pk %}" class="btn btn-sm btn-primary">Edit</a>
+            <a href="{% url 'contact_app:delete_confirm' contact.pk %}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
+        {% endfor %}
+    </tbody>
+</table>
+<ul class="pagination justify-content-center">
+    {% if contacts.has_previous %}
+    <li class="page-item">
+        <a class="page-link"
+           href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ contacts.previous_page_number }}">Previous</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+
+    {% for num in contacts.paginator.page_range %}
+    {% if contacts.number == num %}
+    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+    {% else %}
+    <li class="page-item">
+        <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ num }}">{{ num }}</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+
+    {% if contacts.has_next %}
+    <li class="page-item">
+        <a class="page-link"
+           href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ contacts.next_page_number }}">Next</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+</ul>
+
+
+{% endblock %}
