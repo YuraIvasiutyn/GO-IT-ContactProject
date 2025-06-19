@@ -59,7 +59,22 @@
       + note.html
       + notes_by_tag.html
      
-   . вмерджити свої зміни в дев-гілку
+
+
++ створити requirements.txt
+     poetry run pip freeze > requirements.txt
+     poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+запаблішити десь на хості https://render.com
+     + Перейди на https://render.com → New → Web Service
+     + Вибери GitHub репозиторій
+     + Python environment
+     + Назви start command:
+          gunicorn basic_project.wsgi:application
+     + Увімкни авто-deploy
+     Додай DJANGO_SECRET_KEY, DEBUG=False, ALLOWED_HOSTS
+
+вмерджити свої зміни в дев-гілку
 -----------------
 + Зберігати нотатки з текстовою інформацією;
 + Редагувати та видаляти нотатки;
