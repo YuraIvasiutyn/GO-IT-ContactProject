@@ -4,11 +4,20 @@
 
 <h1 class="text-center">{{ title }}</h1>
 <hr>
-<form action="{% url 'contact_app:main' %}" method="get" class="d-flex justify-content-end">
-    <div class="input-group mb-3" style="max-width: 400px; width: 100%;">
-        {{ form.q }}
+<form action="{% url 'contact_app:main' %}" method="get" class="d-flex flex-row-reverse">
+    <div class="input-group flex-nowrap mb-3">
+        <label style="width: 200px;" class="input-group-text w-100">
+            {{ query_form.query }}
+        </label>
+        <label style="width: 220px; flex-shrink: 0;" class="input-group-text">Days to birthday
+            {{query_form.days }}
+        </label>
+
+
         <button class="btn btn-outline-secondary" type="submit">Search</button>
-        <a href="{% url 'contact_app:main' %}" class="btn btn-outline-danger">Clear</a>
+        <a href="{% url 'contact_app:main' %}"
+
+           class="btn  btn-outline-danger d-flex justify-content-center align-items-center">Clear</a>
     </div>
 </form>
 <hr>
@@ -20,7 +29,7 @@
         <th scope="col">Email</th>
         <th scope="col">Phone</th>
         <th scope="col">Birthday</th>
-        <th class="text-center "  style="width: 150px;"  scope="col">Actions</th>
+        <th class="text-center " style="width: 150px;" scope="col">Actions</th>
     </tr>
     </thead>
     <tbody>
@@ -31,42 +40,74 @@
         <td class="fw-bold" title="{{ contact.email }}">{{ contact.email }}</td>
         <td class="fw-bold" title="{{ contact.phone }}">{{ contact.phone }}</td>
         <td class="fw-bold" title="{{ contact.birthday }}">{{ contact.birthday }}</td>
-        <td class="text-center "  style="width: 140px;">
+        <td class="text-center " style="width: 140px;">
             <a href="{% url 'contact_app:edit_contact' contact.pk %}" class="btn btn-sm btn-primary">Edit</a>
             <a href="{% url 'contact_app:delete_confirm' contact.pk %}" class="btn btn-sm btn-danger">Delete</a>
         </td>
         {% endfor %}
     </tbody>
 </table>
+{% with current=contacts.number total=contacts.paginator.num_pages %}
 <ul class="pagination justify-content-center">
+
     {% if contacts.has_previous %}
     <li class="page-item">
         <a class="page-link"
-           href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ contacts.previous_page_number }}">Previous</a>
+           href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.days %}days={{ request.GET.days }}&{% endif %}page={{ contacts.previous_page_number }}">Previous</a>
     </li>
     {% else %}
     <li class="page-item disabled"><span class="page-link">Previous</span></li>
     {% endif %}
 
+
+    {% if current > 3 %}
+    <li class="page-item">
+        <a class="page-link"
+           href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.days %}days={{ request.GET.days }}&{% endif %}page=1">1</a>
+    </li>
+    {% if current > 4 %}
+    <li class="page-item disabled"><span class="page-link">…</span></li>
+    {% endif %}
+    {% endif %}
+
+
     {% for num in contacts.paginator.page_range %}
-    {% if contacts.number == num %}
+    {% if num >= current|add:'-2' and num <= current|add:'2' %}
+    {% if num == current %}
     <li class="page-item active"><span class="page-link">{{ num }}</span></li>
     {% else %}
     <li class="page-item">
-        <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ num }}">{{ num }}</a>
+        <a class="page-link"
+           href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.days %}days={{ request.GET.days }}&{% endif %}page={{ num }}">
+            {{ num }}</a>
     </li>
     {% endif %}
+    {% endif %}
     {% endfor %}
+
+
+    {% if current < total|add:'-2' %}
+    {% if current < total|add:'-3' %}
+    <li class="page-item disabled"><span class="page-link">…</span></li>
+    {% endif %}
+    <li class="page-item">
+        <a class="page-link"
+           href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.days %}days={{ request.GET.days }}&{% endif %}page={{ total }}">
+             {{ total }}</a>
+    </li>
+    {% endif %}
+
 
     {% if contacts.has_next %}
     <li class="page-item">
         <a class="page-link"
-           href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ contacts.next_page_number }}">Next</a>
+           href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.days %}days={{ request.GET.days }}&{% endif %}page={{ contacts.next_page_number }}">Next</a>
     </li>
     {% else %}
     <li class="page-item disabled"><span class="page-link">Next</span></li>
     {% endif %}
 </ul>
+{% endwith %}
 
 
 {% endblock %}

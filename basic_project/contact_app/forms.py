@@ -1,18 +1,27 @@
-from django.forms import ModelForm, CharField, EmailField, DateField, TextInput, EmailInput, DateInput
-from django import forms
+from django.forms import Form, ModelForm, NumberInput, IntegerField, CharField, EmailField, DateField, TextInput, \
+    EmailInput, \
+    DateInput
+
 from .models import Contact
 
 
-class QueryForm(forms.Form):
-    q = forms.CharField(
-        max_length=100,
-        label='Search',
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Search',
-            'id': 'q'
+class QueryForm(Form):
+    query = CharField(
+        max_length=100, required=False, label='Search',
+        widget=TextInput(attrs={
+            'class': 'form-control', 'placeholder': 'Search', 'id': 'query'
         })
     )
+    days = IntegerField(
+        required=False, min_value=0, max_value=365, label='Days to birthday',
+        widget=NumberInput(attrs={
+            'class': 'form-control', 'placeholder': '365', 'type': 'number', 'id': 'days'
+        })
+    )
+
+    class Meta:
+        model = Contact
+        fields = ['query', 'days']
 
 
 class AddContactForm(ModelForm):
