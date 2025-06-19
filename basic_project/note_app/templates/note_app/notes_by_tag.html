@@ -1,0 +1,20 @@
+{% extends "note_app/base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <!-- Основна частина -->
+    <div class="col-md-8">
+        <h3 class="mb-4">
+            Search by tag:
+            <span class="badge bg-primary">{{ tag.name }}</span>
+        </h3>
+
+        <!-- Відображення нотаток -->
+        {% include 'note_app/partials/note_section.html' %}
+    </div>
+
+    <!-- Блок "Top 10 Tags" -->
+    {% include 'note_app/partials/top_10_tags.html' %}
+</div>
+{% endblock %}

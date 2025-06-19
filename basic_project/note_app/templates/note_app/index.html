@@ -1,0 +1,17 @@
+{% extends "note_app/base.html" %} 
+
+{% block content%}
+
+<div class="row">
+    <div class="col-md-8">
+        <h1>My notes:</h1>
+        
+        <!-- відображення цитат -->
+        {% include 'note_app/partials/note_section.html' %}
+    </div>
+    
+    <!-- Блок "Top Ten Tags" -->
+    {% include 'note_app/partials/top_10_tags.html' %}
+</div>
+
+{% endblock %}
