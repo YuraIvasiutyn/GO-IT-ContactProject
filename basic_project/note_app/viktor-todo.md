@@ -71,23 +71,16 @@
           gunicorn basic_project.wsgi:application
      + Увімкни авто-deploy
      + Додай DJANGO_SECRET_KEY, DEBUG=False, ALLOWED_HOSTS
-
 -----
 + як закріпити верхнє меню щоб воно завжди було видиме, навіть при прокрутці?
 + додати меню для інших модулів сайту
 + додати підменю для нотаток
 + додати сортування нотаток по зростанню/спаданню
-
++ зняти код з дев гілки + conflict resolve
++ запаблішити нову версію коду на render
 вмерджити свої зміни в дев-гілку
-     + зняти код з дев гілки
-     запаблішити нове версію коду
-
-Вітаю,
-* зробив стартову сторінку
-* переніс базовий темплей
-код доступний в дев-гілці
-посилання на проект
 ----
-# Final actions
+# Final actions для production-режиму
 1. Django settings file
-     DEBUG = Fale
+     DEBUG = False
+     ALLOWED_HOSTS = ['your-app-name.onrender.com']
