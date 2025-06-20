@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Мої файли</h2>
+
+  <form method="get">
+    <label>Фільтр за категорією:</label>
+    <select name="category" onchange="this.form.submit()">
+      <option value="">Усі</option>
+      <option value="image" {% if request.GET.category == 'image' %}selected{% endif %}>Зображення</option>
+      <option value="document" {% if request.GET.category == 'document' %}selected{% endif %}>Документи</option>
+      <option value="video" {% if request.GET.category == 'video' %}selected{% endif %}>Відео</option>
+      <option value="other" {% if request.GET.category == 'other' %}selected{% endif %}>Інше</option>
+    </select>
+  </form>
+
+  <ul>
+    {% for file in files %}
+      <li>
+        <strong>{{ file.category|title }}</strong> — 
+        <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a> ({{ file.uploaded_at|date:"d.m.Y H:i" }})
+      </li>
+    {% empty %}
+      <li>Немає завантажених файлів.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'upload_file' %}">← Назад до завантаження</a>
+{% endblock %}

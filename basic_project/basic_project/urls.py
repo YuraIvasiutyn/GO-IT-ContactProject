@@ -25,4 +25,5 @@ urlpatterns = [
     path('dev-login/', views.dev_login, name='dev-login'),
 
     path('note/', include('note_app.urls')),
+    path('contact_app/', include('contact_app.urls')),
 ]
