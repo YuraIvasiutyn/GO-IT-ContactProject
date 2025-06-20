@@ -1,17 +1,20 @@
-{% extends "note_app/base.html" %} 
+{% extends "base.html" %} 
 
-{% block content%}
-
-<div class="row">
-    <div class="col-md-8">
-        <h1>My notes:</h1>
-        
-        <!-- відображення цитат -->
-        {% include 'note_app/partials/note_section.html' %}
-    </div>
+{% block content %}
+<div class="container-lg py-4">
+    <div class="row">
     
-    <!-- Блок "Top Ten Tags" -->
-    {% include 'note_app/partials/top_10_tags.html' %}
-</div>
+        <!-- Перша колонка: нотатки -->
+        <div class="central-content content-card mx-auto col-md-8" style="max-width: 1140px;">
+            <h1 class="mb-4">📝 My Notes</h1>
+            {% include 'note_app/partials/note_section.html' %}
+        </div>
+  
+        <!-- Друга колонка: Top 10 Tags -->
+        <div class="col-md-3">
+            {% include 'note_app/partials/top_10_tags.html' %}
+        </div>
 
+    </div>
+</div>
 {% endblock %}

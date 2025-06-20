@@ -1,4 +1,5 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+<nav class="navbar navbar-expand-lg border-bottom bg-body-tertiary shadow-sm">
+<!-- <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom"> -->
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'note_app:main' %}">📝 Personal Assistant</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -32,6 +33,19 @@
           {% endif %}
         {% endif %}
       </ul>
+
+      <!-- Theme switcher -->
+      <form class="d-flex align-items-right ms-3">
+        <label for="theme-select" class="form-label me-2 mb-0">🌓</label>
+        <select class="form-select form-select-sm" id="theme-select" onchange="changeTheme(this.value)">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </form>
+
+  </div>
+</form>
 
       <!-- Права частина меню (user info/login/logout) -->
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

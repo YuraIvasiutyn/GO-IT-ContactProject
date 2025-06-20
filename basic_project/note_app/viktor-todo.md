@@ -59,26 +59,34 @@
       + note.html
       + notes_by_tag.html
      
-
-
 + створити requirements.txt
      poetry run pip freeze > requirements.txt
      poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-запаблішити десь на хості https://render.com
++ запаблішити десь на хості https://render.com
      + Перейди на https://render.com → New → Web Service
      + Вибери GitHub репозиторій
      + Python environment
      + Назви start command:
           gunicorn basic_project.wsgi:application
      + Увімкни авто-deploy
-     Додай DJANGO_SECRET_KEY, DEBUG=False, ALLOWED_HOSTS
+     + Додай DJANGO_SECRET_KEY, DEBUG=False, ALLOWED_HOSTS
+
+-----
++ як закріпити верхнє меню щоб воно завжди було видиме, навіть при прокрутці?
++ додати меню для інших модулів сайту
++ додати підменю для нотаток
++ додати сортування нотаток по зростанню/спаданню
 
 вмерджити свої зміни в дев-гілку
------------------
-+ Зберігати нотатки з текстовою інформацією;
-+ Редагувати та видаляти нотатки;
-+ Додавати в нотатки "теги", ключові слова, що описують тему та предмет запису;
-+ Здійснювати пошук за ключовими словами (тегами).
-- сортування нотаток за ключовими словами (тегами)?
-- Проводити пошук за нотатками;
+     запаблішити нове версію коду
+
+Вітаю,
+* зробив стартову сторінку
+* переніс базовий темплей
+код доступний в дев-гілці
+посилання на проект
+----
+# Final actions
+1. Django settings file
+     DEBUG = Fale

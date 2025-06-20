@@ -25,7 +25,7 @@ class NoteForm(ModelForm):
         required=False,
         widget=Textarea(attrs={
             'class': 'form-control',
-            'rows': 10,
+            'rows': 6,
             'style': 'resize: vertical;',
             'placeholder': 'write your note here...'
         })

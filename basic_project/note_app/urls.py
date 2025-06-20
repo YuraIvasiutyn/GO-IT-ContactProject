@@ -4,12 +4,8 @@ from . import views
 app_name = 'note_app'
 
 urlpatterns = [
-    path('', views.main, name='main'),
-    path('error/<str:message>', views.error, name='error-page'),
-    path('dev-login/', views.dev_login, name='dev-login'),
-
-
-    path('tag/', views.tag, name='tag'),
+    path('main/', views.main, name='note-main'),
+    path('tag/', views.tag, name='note-tag'),
     path('tag/<str:tag_name>', views.search_by_tag, name='notes-by-tag'),
 
     path('note/', views.note, name='note'),

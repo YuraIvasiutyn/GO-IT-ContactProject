@@ -11,24 +11,6 @@ from django.db.models import Q
 from .forms import TagForm, NoteForm
 from .models import Tag, Note
 
-# ------------------------------------------------------------------------
-# лише на час розробки потім прибрати - це мій ІД
-from django.contrib.auth import login
-from django.contrib.auth import get_user_model
-
-
-User = get_user_model()
-ID = 4
-
-def dev_login(request):
-    if not request.user.is_authenticated:
-        dev_user = User.objects.get(username="viktor")  # або твій логін
-        dev_user.backend = 'django.contrib.auth.backends.ModelBackend'
-        login(request, dev_user)
-    return redirect('note_app:main')
-
-# ------------------------------------------------------------------------
-
 
 def count_top_tags(number_of_tags=10, min_font_size=10, max_font_size=28):
     # Отримуємо топ-10 тегів за кількістю використань
@@ -70,10 +52,17 @@ def get_notes_on_page(request) -> int:
 def main(request):
     search_query = request.GET.get("search", "")
     notes_on_page = get_notes_on_page(request)
+    sort_order = request.GET.get("sort", "")
+
     notes = Note.objects.all()
 
     if notes and search_query:
         notes = notes.filter(Q(note__icontains=search_query) | Q(note_title__icontains=search_query))
+
+    if sort_order == "asc":
+        notes = notes.order_by("note_title")
+    elif sort_order == "desc":
+        notes = notes.order_by("-note_title")
 
     # Отримуємо топ-10 тегів за кількістю використань
     top_tags = count_top_tags()
@@ -113,7 +102,7 @@ def tag(request):
     if not request.user.is_authenticated:
         my_tags = Tag.objects.filter(user=request.user).all()
     else:
-        my_tags = Tag.objects.filter(user_id=ID).all()
+        my_tags = Tag.objects.filter(user_id=4).all()
 
     if request.method == 'POST':
         form = TagForm(request.POST)
@@ -202,6 +191,7 @@ def note(request, note_id=None):
             }
         )
 
+
 @login_required
 def note_detail(request, note_id):
     note = get_object_or_404(Note, pk=note_id)
@@ -272,13 +262,3 @@ def search_by_tag(request, tag_name):
                 'notes_per_page': notes_on_page,
             }
         )
-
-
-def error(response, message):
-    return render(
-        response,
-        'note_app/error.html',
-        {
-            'message': message
-        }
-    )
