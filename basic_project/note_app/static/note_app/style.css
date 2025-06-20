@@ -1,0 +1,115 @@
+a.badge.bg-secondary:hover {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+    text-decoration: none;
+}
+a.badge.bg-secondary {
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.card {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border: 1px solid #838687;
+}
+
+.card:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+[data-bs-theme="light"] .card:hover {
+  background-color: #dfebfd;
+}
+
+[data-bs-theme="dark"] .card:hover {
+  background-color: #06162a;
+}
+
+.page-link {
+  transition: all 0.2s ease-in-out;
+  border-radius: 6px;
+}
+
+.page-link:hover {
+  background-color: var(--bs-primary);
+  color: #fff;
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
+}
+/* ---------------------------------------------------*/
+/* картка нотатки */
+.note-card {
+    transition: box-shadow 0.3s ease;
+    /* transition: all 0.3s ease-in-out; */
+    
+    height: 220px; /* фіксована висота картки */
+    position: relative;
+    cursor: pointer;
+    /*overflow: hidden; */
+    overflow: visible; /* дозволяє випливати меню */
+}
+
+.note-card:hover {
+  box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.2); /* виразна тінь */
+  transform: translateY(-2px); /* легке підняття */
+  border-color: #0d6efd;
+}
+
+[data-bs-theme="dark"] .note-card:hover {
+  box-shadow: 0 1rem 1rem rgba(255, 255, 255, 0.2); /* виразна тінь */
+}
+
+.note-card.expanded {
+    height: auto; /* коли картка розкрита */
+}
+
+.note-card-body {
+    height: 100%;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+/* ---------------------------------------------------*/
+[data-bs-theme="light"] .central-content {
+  background-color: #effcff;
+}
+
+[data-bs-theme="dark"] .central-content {
+  background-color: #282828;
+}
+/* ---------------------------------------------------*/
+/* налаштування картки де знаходиться основний контент*/
+.content-card {
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+/* Додатково — адаптація під темну-світлу тему */
+[data-bs-theme="dark"] .content-card {
+  border: 1px solid rgba(255, 255, 255, 0.5); /*колір рамки */  
+  box-shadow: 0 1.75rem 2.5rem rgba(255, 255, 255, 0.3);
+}
+
+[data-bs-theme="dark"] .content-card:hover {
+  box-shadow: 0 2rem 3rem rgba(255, 255, 255, 0.3);
+}
+
+[data-bs-theme="light"] .content-card {
+  border: 1px solid rgba(0, 0, 0, 0.5); /*колір рамки */  
+  box-shadow: 0 1.75rem 2.5rem rgba(0, 0, 0, 0.5); /* виразна тінь */
+}
+/* ---------------------------------------------------*/
+/*налаштування підсвічування пунктів меню нотатки*/
+.dropdown-item {
+  transition: background-color 0.2s ease, color 0.2s ease; /*додає анімацію зміни кольорів*/
+}
+
+.dropdown-item.dropdown-edit:hover {
+  background-color: #fff3cd; /* light yellow */
+  color: #856404; /* темно-жовтий текст */
+}
+
+.dropdown-item.dropdown-delete:hover {
+  background-color: #f8d7da; /* light red */
+  color: #721c24; /* темно-червоний текст */
+}

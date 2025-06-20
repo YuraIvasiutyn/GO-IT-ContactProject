@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">🧠 Personal Assistant Dashboard</h1>
+        <p class="lead text-muted">Manage your notes, contacts, files and scraped data from one place.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <!-- Notes Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">📝 Notes</h5>
+                    <p class="card-text">Create and organize your personal notes with tags.</p>
+                    <a href="{% url 'note_app:note-main' %}" class="btn btn-primary me-2">View Notes</a>
+                    <a href="{% url 'note_app:note' %}" class="btn btn-outline-primary btn-sm">➕ Add Note</a>
+                    <a href="{% url 'note_app:note-tag' %}" class="btn btn-outline-secondary btn-sm">🏷️ Add Tag</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">📇 Contacts</h5>
+                    <p class="card-text">Manage your personal and professional contacts in one place.</p>                    
+                    <a href="{% url 'contact_app:main' %}" class="btn btn-primary me-2">View Contacts</a>
+                    <a href="{% url 'contact_app:add_contact' %}" class="btn btn-outline-primary btn-sm">➕ Add Contact</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">📂 File Manager</h5>
+                    <p class="card-text">Upload and manage your documents and media files securely.</p>
+                    <a href="" class="btn btn-primary">Browse Files</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scraping Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">🌐 Data Scraper</h5>
+                    <p class="card-text">Scrape and analyze external data sources quickly and easily.</p>
+                    <a href="" class="btn btn-primary">Open Scraper</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card:hover {
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+    transition: all 0.3s ease-in-out;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,47 @@
+/* Navbar background адаптований під тему */
+[data-bs-theme="light"] .navbar {
+  background-color: #cfe4fb !important;
+  color: #000000;
+}
+
+[data-bs-theme="dark"] .navbar {
+  background-color: #31373c !important;
+  color: #f8f9fa;
+}
+
+/* Навігаційні лінки */
+.navbar .nav-link {
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+[data-bs-theme="light"] .navbar .nav-link {
+  color: #212529;
+}
+
+[data-bs-theme="light"] .navbar .nav-link:hover {
+  color: #0d6efd;
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+[data-bs-theme="dark"] .navbar .nav-link {
+  color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .navbar .nav-link:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Стилізація dropdown */
+[data-bs-theme="dark"] .dropdown-menu {
+  background-color: #343a40;
+  color: #fff;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+  color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+  background-color: #495057;
+}

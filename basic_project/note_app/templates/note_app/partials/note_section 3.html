@@ -1,0 +1,105 @@
+<!-- 🔢 Форма вибору кількості нотаток -->
+<form method="get" class="mb-4">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <label for="notes_per_page" class="col-form-label">Notes on page::</label>
+        </div>
+        <div class="col-auto">
+            <select name="notes_per_page" id="notes_per_page" class="form-select" onchange="this.form.submit()">
+                <option value="5" {% if request.GET.notes_per_page == '5' %}selected{% endif %}>5</option>
+                <option value="10" {% if request.GET.notes_per_page == '10' %}selected{% endif %}>10</option>
+                <option value="20" {% if request.GET.notes_per_page == '20' %}selected{% endif %}>20</option>
+                <option value="50" {% if request.GET.notes_per_page == '50' %}selected{% endif %}>50</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <input type="text" name="search" value="{{ request.GET.search }}" class="form-control" placeholder="🔍 Search in notes..." />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+
+    </div>
+</form>
+
+<!-- 📝 Список нотаток -->
+<div class="d-flex flex-column gap-5">
+    {% for note in page_obj %}
+        <div class="card shadow-sm h-100 note-card" itemscope itemtype="http://schema.org/CreativeWork">
+            <div class="card-body position-relative">
+
+                <!-- 📌 Міні-меню -->
+                <div class="dropdown position-absolute top-0 end-0 m-2">
+                <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    ⋮
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'note_app:note-edit' note.id %}">✏️ Edit</a></li>
+                    <li><a class="dropdown-item" href="{% url 'note_app:note-delete' note.id %}">🗑️ Delete</a></li>
+                </ul>
+                </div>
+
+                <!-- 🔽 Заголовок з можливістю розгортання -->
+                <h5 class="card-title toggle-note" style="cursor: pointer;">{{ note.note_title }}</h5>
+
+                <!-- 🔽 Текст (спочатку прихований) -->
+                <div class="note-body collapse">
+                <p class="card-text small text-body-secondary" itemprop="text">
+                    {{ note.note }}
+                </p>
+
+                <div class="mt-2 text-muted small">
+                    <div>📅 created: {{ note.created|date:"d.m.Y H:i" }}</div>
+                    <div>🛠️ modified: {{ note.last_modified_at|date:"d.m.Y H:i" }}</div>
+                </div>
+
+                <div class="mt-2">
+                    <strong>Tags:</strong>
+                    {% for tag in note.tags.all %}
+                    <a class="badge bg-secondary text-decoration-none me-1" href="{% url 'note_app:notes-by-tag' tag.name %}">
+                        {{ tag.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                </div>
+
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">Нотаток не знайдено.</p>
+    {% endfor %}
+ </div>
+
+
+ 
+<!-- 📄 Пагінація -->
+{% if page_obj.paginator.num_pages > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1&notes_per_page={{ request.GET.notes_per_page }}">« First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&notes_per_page={{ request.GET.notes_per_page }}">‹ Prev</a>
+            </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&notes_per_page={{ request.GET.notes_per_page }}">Next ›</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&notes_per_page={{ request.GET.notes_per_page }}">Last »</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
