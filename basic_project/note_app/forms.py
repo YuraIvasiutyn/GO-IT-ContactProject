@@ -1,4 +1,5 @@
-from django.forms import ModelForm, CharField, TextInput, Textarea, DateField, DateInput, HiddenInput, IntegerField
+from django.forms import ModelForm, CharField, TextInput, Textarea
+#, DateField, DateInput, HiddenInput, IntegerField
 from .models import Tag, Note
 from django import forms
 

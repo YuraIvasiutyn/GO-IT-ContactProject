@@ -13,64 +13,103 @@
             </select>
         </div>
 
-        <div class="col-auto">
-            <input type="text" name="search" value="{{ request.GET.search }}" class="form-control" placeholder="🔍 Search in notes..." />
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Search</button>
-        </div>
+      <!-- сортування -->
+      <div class="col-auto d-flex align-items-center gap-2">
+          <label class="col-form-label mb-0">Sort:</label>
 
+          <a href="?sort=asc&notes_per_page={{ request.GET.notes_per_page|default:"10" }}&search={{ request.GET.search }}"
+            class="btn btn-outline-secondary btn-sm {% if request.GET.sort == 'asc' %}active{% endif %}" title="A → Z">
+            <i class="bi bi-sort-alpha-down"></i>
+          </a>
+
+          <a href="?sort=desc&notes_per_page={{ request.GET.notes_per_page|default:"10" }}&search={{ request.GET.search }}"
+            class="btn btn-outline-secondary btn-sm {% if request.GET.sort == 'desc' %}active{% endif %}" title="Z → A">
+            <i class="bi bi-sort-alpha-up"></i>
+          </a>
+        </div>
+        
+      <!-- пошук -->
+      <div class="col-auto">
+        <input type="text" name="search" value="{{ request.GET.search }}" class="form-control" placeholder="🔍 Search in notes..." />
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div>
     </div>
 </form>
 
 <!-- 📝 Список нотаток -->
-<div class="d-flex flex-column gap-3">
-    {% for note in page_obj %}
-        <div class="card shadow-sm h-100 note-card" itemscope itemtype="http://schema.org/CreativeWork">
-            <div class="card-body position-relative">
+<div class="row g-4">
+  {% for note in page_obj %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="note-wrapper">
+          <!-- Меню у верхньому куті за межами картки бо перекриваються менюшки-->
+          {% if note.id %}
+          <div class="dropdown position-absolute top-0 end-0 m-2">
+            <button 
+              class="btn btn-sm btn-light border dropdown-toggle" 
+              type="button" 
+              data-bs-toggle="dropdown"
+              data-bs-container="body">
+              ⋮
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item dropdown-edit" href="{% url 'note_app:note-edit' note.id %}">✏️ Edit</a></li>
+              <li><a class="dropdown-item dropdown-delete" href="{% url 'note_app:note-delete' note.id %}">🗑️ Delete</a></li>
 
-                <!-- 📌 Міні-меню -->
-                <div class="dropdown position-absolute top-0 end-0 m-2">
-                <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    ⋮
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{% url 'note_app:note-edit' note.id %}">✏️ Edit</a></li>
-                    <li><a class="dropdown-item" href="{% url 'note_app:note-delete' note.id %}">🗑️ Delete</a></li>
-                </ul>
-                </div>
-
-                <!-- 🔽 Заголовок з можливістю розгортання -->
-                <h5 class="card-title toggle-note" style="cursor: pointer;">{{ note.note_title }}</h5>
-
-                <!-- 🔽 Текст (спочатку прихований) -->
-                <div class="note-body collapse">
-                <p class="card-text small text-body-secondary" itemprop="text">
-                    {{ note.note }}
-                </p>
-
-                <div class="mt-2 text-muted small">
-                    <div>📅 created: {{ note.created|date:"d.m.Y H:i" }}</div>
-                    <div>🛠️ modified: {{ note.last_modified_at|date:"d.m.Y H:i" }}</div>
-                </div>
-
-                <div class="mt-2">
-                    <strong>Tags:</strong>
-                    {% for tag in note.tags.all %}
-                    <a class="badge bg-secondary text-decoration-none me-1" href="{% url 'note_app:notes-by-tag' tag.name %}">
-                        {{ tag.name }}
-                    </a>
+              <li>
+                <!-- Форма вибору кольору -->
+                <form method="post" action="{% url 'note_app:note-color-update' note.id %}" class="mt-2 px-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="color" id="color-{{ note.id }}">
+                  <div class="d-flex flex-wrap gap-1">
+                    {% for hex in preset_colors %}
+                      <button type="submit"
+                              class="btn btn-sm border"
+                              style="background-color: {{ hex }}; width: 24px; height: 24px;"
+                              onclick="document.getElementById('color-{{ note.id }}').value='{{ hex }}';">
+                      </button>
                     {% endfor %}
-                </div>
-                </div>
+                  </div>
+                </form>
+              </li>
 
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- формування карточки -->
+          <!-- <div class="card note-card h-100 position-relative" style="--note-color: {{ note.color }}"> -->
+          <div class="card note-card h-100 position-relative" style="background-color: {{ note.color|default:'#dea60c' }};">
+            <!-- Заголовок (натискається) -->
+            <div class="card-body" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#note-{{ note.id }}">
+              <h5 class="card-title mb-0">{{ note.note_title }}</h5>
             </div>
-        </div>
-    {% empty %}
-        <p class="text-muted">Нотаток не знайдено.</p>
-    {% endfor %}
- </div>
 
+            <!-- Прихований блок -->
+            <div class="collapse px-3 pb-3" id="note-{{ note.id }}">
+              <hr class="my-2" />
+              <p class="small mb-1">{{ note.note }}</p>
+
+              <div class="text-muted small">
+                📅 {{ note.created|date:"d.m.Y H:i" }}<br />
+                🛠️ {{ note.last_modified_at|date:"d.m.Y H:i" }}
+              </div>
+
+              <div class="mt-2">
+                <strong>Tags:</strong>
+                {% for tag in note.tags.all %}
+                  <a class="badge bg-secondary text-decoration-none me-1" href="{% url 'note_app:notes-by-tag' tag.name %}">{{ tag.name }}</a>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+ <br>
 <!-- 📄 Пагінація -->
 {% if page_obj.paginator.num_pages > 1 %}
 <nav aria-label="Page navigation">
@@ -100,4 +139,5 @@
         {% endif %}
     </ul>
 </nav>
+
 {% endif %}

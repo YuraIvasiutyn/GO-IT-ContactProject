@@ -6,7 +6,9 @@
     
         <!-- Перша колонка: нотатки -->
         <div class="central-content content-card mx-auto col-md-8" style="max-width: 1140px;">
-            <h1 class="mb-4">📝 My Notes</h1>
+            <h1 class="mb-4">
+                📝 <a href="{% url 'note_app:note-main' %}">My Notes</a>
+            </h1>
             {% include 'note_app/partials/note_section.html' %}
         </div>
   
