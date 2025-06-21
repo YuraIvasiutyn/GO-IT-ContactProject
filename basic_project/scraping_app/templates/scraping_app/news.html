@@ -1,57 +1,71 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <title>Огляд валют</title>
-    <link rel="stylesheet" href="{% static 'scraping_app/style.css' %}">
-</head>
-<body>
-    <header>
-        <div class="container">
-            <h1>Свіжі новини валют</h1>
-            <form method="get" class="date-form">
-                <label for="date">Оберіть дату:</label>
-                <input type="date" id="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
 
-                <fieldset class="currency-filter">
-                    <legend>Оберіть валюту(и):</legend>
-                    <div class="currency-list">
-                        {% for code in available_currencies %}
-                            <label>
-                                <input type="checkbox" name="currencies" value="{{ code }}"
-                                    {% if code in selected_currencies %}checked{% endif %}>
-                                {{ code }}
-                            </label>
-                        {% endfor %}
-                    </div>
-                </fieldset>
+{% block content %}
+<link rel="stylesheet" href="{% static 'scraping_app/style.css' %}">
 
-                <button type="submit">Показати</button>
-            </form>
-        </div>
-    </header>
+<header>
+    <div class="container">
+        <h1>Latest Currency News</h1>
+        <form method="get" class="date-form">
+            <label for="date">Select date:</label>
+            <input type="date" id="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
 
-    <main class="container">
-        <section class="news-grid">
-            {% for r in rates %}
-            <article class="news-card">
-                <img src="{% static 'scraping_app/img/'|add:r.currency_code|add:'.jpg' %}" alt="{{ r.currency_code }}">
-                <div class="news-content">
-                    <h2>{{ r.currency_name }} ({{ r.currency_code }})</h2>
-                    <p>Курс на {{ selected_date }}: <strong>{{ r.rate }}</strong> грн</p>
+            <fieldset class="currency-filter">
+                <legend>Select currency(ies):</legend>
+                <div class="currency-list">
+                    {% for code in available_currencies %}
+                        <label>
+                            <input type="checkbox" name="currencies" value="{{ code }}"
+                                {% if code in selected_currencies %}checked{% endif %}>
+                            {{ code }}
+                        </label>
+                    {% endfor %}
                 </div>
-            </article>
-            {% empty %}
-            <p>Немає даних для обраної дати та вибраних валют.</p>
-            {% endfor %}
-        </section>
-    </main>
+            </fieldset>
 
-    <footer>
-        <div class="container">
-            <p>&copy; {{ now|default:"2025" }} Курс валют | Дані від НБУ</p>
-        </div>
-    </footer>
-</body>
-</html>
+            <button type="submit">Show</button>
+        </form>
+    </div>
+</header>
+
+<main class="container">
+    <section class="news-grid">
+        {% for r in page_obj %}
+        <article class="news-card">
+            <img src="{% static 'scraping_app/img/'|add:r.currency_code|add:'.jpg' %}" alt="{{ r.currency_code }}">
+            <div class="news-content">
+                <h2>{{ r.currency_name }} ({{ r.currency_code }})</h2>
+                <p>Exchange rate on {{ selected_date }}: <strong>{{ r.rate }}</strong> UAH</p>
+            </div>
+        </article>
+        {% empty %}
+        <p>No data available for the selected date and currencies.</p>
+        {% endfor %}
+    </section>
+</main>
+
+<div class="pagination-container">
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if selected_date %}&date={{ selected_date|date:'Y-m-d' }}{% endif %}{% for c in selected_currencies %}&currencies={{ c }}{% endfor %}" class="page-link prev">← Previous</a>
+        {% else %}
+            <span class="page-link disabled prev">← Previous</span>
+        {% endif %}
+
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if selected_date %}&date={{ selected_date|date:'Y-m-d' }}{% endif %}{% for c in selected_currencies %}&currencies={{ c }}{% endfor %}" class="page-link next">Next →</a>
+        {% else %}
+            <span class="page-link disabled next">Next →</span>
+        {% endif %}
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <p>&copy; {{ now|default:"2025" }} Exchange Rates | Data from NBU</p>
+    </div>
+</footer>
+{% endblock %}

@@ -43,4 +43,4 @@ def get_rates_by_date(date_obj: datetime, currencies: list = None):
         if rates.exists():
             return list(rates)
         else:
-            return fetch_and_save_nbu_rates_for_date(date_obj, currencies=[])
+            return fetch_and_save_nbu_rates_for_date(date_obj, currencies=currencies)

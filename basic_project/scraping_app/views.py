@@ -1,6 +1,10 @@
-from django.shortcuts import render
-from .currency_fetcher import get_rates_by_date
 from datetime import datetime
+
+from django.shortcuts import render
+from django.core.paginator import Paginator
+
+from .currency_fetcher import get_rates_by_date
+
 
 AVAILABLE_CURRENCIES = ['USD', 'EUR', 'PLN', 'GBP', 'CHF', 'CZK', 'SEK', 'NOK']
 
@@ -17,11 +21,15 @@ def currency_view(request):
     else:
         date_obj = datetime.today().date()
 
-    currency_filter = currencies if currencies else None
+    currency_filter = currencies if currencies else AVAILABLE_CURRENCIES
     rates = get_rates_by_date(date_obj, currency_filter)
 
+    paginator = Paginator(rates, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "scraping_app/news.html", {
-        "rates": rates,
+        "page_obj": page_obj,
         "selected_date": date_obj,
         "available_currencies": AVAILABLE_CURRENCIES,
         "selected_currencies": currencies
