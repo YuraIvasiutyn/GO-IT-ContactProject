@@ -26,4 +26,6 @@ urlpatterns = [
 
     path('note/', include('note_app.urls')),
     path('contact_app/', include('contact_app.urls')),
+    path('news/', include('scraping_app.urls')),
+    path('file/', include('file_app.urls')),
 ]

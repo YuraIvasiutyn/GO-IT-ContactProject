@@ -40,7 +40,7 @@
                 <div class="card-body">
                     <h5 class="card-title">📂 File Manager</h5>
                     <p class="card-text">Upload and manage your documents and media files securely.</p>
-                    <a href="" class="btn btn-primary">Browse Files</a>
+                    <a href="{% url 'file:file_list' %}" class="btn btn-primary">Browse Files</a>
                 </div>
             </div>
         </div>
@@ -49,9 +49,9 @@
         <div class="col">
             <div class="card h-100 shadow-sm border-0 hover-card">
                 <div class="card-body">
-                    <h5 class="card-title">🌐 Data Scraper</h5>
-                    <p class="card-text">Scrape and analyze external data sources quickly and easily.</p>
-                    <a href="" class="btn btn-primary">Open Scraper</a>
+                    <h5 class="card-title">🌐 News</h5>
+                    <p class="card-text">Check the latest exchange rates and track currency trends with up-to-date data from the National Bank of Ukraine.</p>
+                    <a href="{% url 'news:main' %}" class="btn btn-primary">Open News</a>
                 </div>
             </div>
         </div>
