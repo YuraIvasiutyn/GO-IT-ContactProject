@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Форма додавання тегу -->
+        <div class="col-md-8">
+            <div class="content-card rounded-4 p-4">
+                <h2 class="mb-4">➕ Add new tag</h2>
+
+                <form method="POST" action="{% url 'note_app:note-tag' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">Tag:</label>
+                        {{ form.name }}
+                        {% if form.errors.name %}
+                            <div class="text-danger mt-1">{{ form.errors.name }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Список тегів -->
+            <div class="content-card col-md-3">
+                <h3 class="mb-3">🏷️ My tags</h3>
+                {% if tags %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in tags %}
+                            <a href="{% url 'note_app:notes-by-tag' tag.name %}" class="badge bg-secondary text-decoration-none p-2">
+                                {{ tag.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Tags not created yet.</p>
+                {% endif %}
+            </div>
+    </div>
+</div>
+{% endblock %}

@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # потрібно для коректної роботи render хостінгу 
 ]
 
 ROOT_URLCONF = 'basic_project.urls'
@@ -62,7 +63,9 @@ ROOT_URLCONF = 'basic_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "basic_project" / "templates"],
+        'DIRS': [
+            BASE_DIR / "basic_project" / "templates",
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,7 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # важливо для Render
 # Де шукати додаткові статичні файли
 STATICFILES_DIRS = [
     BASE_DIR / "static/",

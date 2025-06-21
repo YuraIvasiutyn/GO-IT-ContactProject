@@ -42,27 +42,45 @@
 <div class="row g-4">
   {% for note in page_obj %}
     <div class="col-12 col-md-6 col-lg-4">
-      <div class="card note-card h-100 position-relative">
+      <div class="card note-card position-relative" style="background-color: {{ note.color|default:'#dea60c' }};" id="note-card-{{ note.id }}">
 
-        <!-- Меню у верхньому куті -->
         {% if note.id %}
-        <div class="dropdown position-absolute top-0 end-0 m-2 z-1">
-          <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        <div class="dropdown position-absolute top-0 end-0 m-2">
+          <button 
+            class="btn btn-sm btn-light border dropdown-toggle" 
+            type="button" 
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            onclick="raiseCardZIndex({{ note.id }})">
             ⋮
           </button>
-          <ul class="dropdown-menu dropdown-menu-end">
+          <ul class="dropdown-menu dropdown-menu-end" onmouseleave="resetCardZIndex({{ note.id }})">
             <li><a class="dropdown-item dropdown-edit" href="{% url 'note_app:note-edit' note.id %}">✏️ Edit</a></li>
             <li><a class="dropdown-item dropdown-delete" href="{% url 'note_app:note-delete' note.id %}">🗑️ Delete</a></li>
+            <li>
+              <form method="post" action="{% url 'note_app:note-color-update' note.id %}" class="mt-2 px-2">
+                {% csrf_token %}
+                <input type="hidden" name="color" id="color-{{ note.id }}">
+                <div class="d-flex flex-wrap gap-1">
+                  {% for hex in preset_colors %}
+                    <button type="submit"
+                            class="btn btn-sm border"
+                            style="background-color: {{ hex }}; width: 24px; height: 24px;"
+                            onclick="document.getElementById('color-{{ note.id }}').value='{{ hex }}';">
+                    </button>
+                  {% endfor %}
+                </div>
+              </form>
+            </li>
           </ul>
         </div>
         {% endif %}
 
-        <!-- Заголовок (натискається) -->
+        <!-- Основна частина картки -->
         <div class="card-body" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#note-{{ note.id }}">
           <h5 class="card-title mb-0">{{ note.note_title }}</h5>
         </div>
 
-        <!-- Прихований блок -->
         <div class="collapse px-3 pb-3" id="note-{{ note.id }}">
           <hr class="my-2" />
           <p class="small mb-1">{{ note.note }}</p>
@@ -79,10 +97,12 @@
             {% endfor %}
           </div>
         </div>
+
       </div>
     </div>
   {% endfor %}
 </div>
+
 
  <br>
 <!-- 📄 Пагінація -->
