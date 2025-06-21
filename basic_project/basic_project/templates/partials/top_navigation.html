@@ -34,17 +34,29 @@
               Contacts
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'contact_app:add_contact' %}">➕ Add Contact</a></li>
-              <li><a class="dropdown-item" href="{% url 'contact_app:main' %}">📋 All Contacts</a></li>
+              <li><a class="dropdown-item" href="{% url 'contact_app:main' %}">
+                <i class="bi bi-person-lines-fill me-1"></i> 
+                View Contacts
+                </a></li>
+              <li><a class="dropdown-item" href="{% url 'contact_app:add_contact' %}">➕ Add Contact</a></li>1
             </ul>
           </li>
 
-          <li class="nav-item">
-            <a class="nav-link" href="">File Manager</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'note_app' %}active{% endif %}" href="#" id="notesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              File Manager
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'file:file_list' %}">
+                <i class="bi bi-folder2-open me-1"></i> 
+                Browse Files
+                </a></li>
+              <li><a class="dropdown-item" href="{% url 'file:upload_file' %}">➕ Upload File</a></li>
+            </ul>
           </li>
           
           <li class="nav-item">
-            <a class="nav-link" href="">Scraped Data</a>
+            <a class="nav-link" href="{% url 'news:main' %}">News</a>
           </li>          
         {% endif %}
       </ul>
