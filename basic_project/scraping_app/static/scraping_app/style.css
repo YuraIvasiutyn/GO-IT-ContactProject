@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background: #0077cc;
+    color: white;
+    padding: 1rem 0;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.date-form {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.date-form input[type="date"],
+.date-form button {
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+main {
+    margin: 2rem 0;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.news-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.news-card:hover {
+    transform: translateY(-4px);
+}
+
+.news-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.news-content {
+    padding: 1rem;
+}
+
+.news-content h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: 2rem;
+}

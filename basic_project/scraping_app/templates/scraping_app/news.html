@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Огляд валют</title>
+    <link rel="stylesheet" href="{% static 'scraping_app/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Свіжі новини валют</h1>
+            <form method="get" class="date-form">
+                <label for="date">Оберіть дату:</label>
+                <input type="date" id="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+
+                <fieldset class="currency-filter">
+                    <legend>Оберіть валюту(и):</legend>
+                    <div class="currency-list">
+                        {% for code in available_currencies %}
+                            <label>
+                                <input type="checkbox" name="currencies" value="{{ code }}"
+                                    {% if code in selected_currencies %}checked{% endif %}>
+                                {{ code }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+
+                <button type="submit">Показати</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="news-grid">
+            {% for r in rates %}
+            <article class="news-card">
+                <img src="{% static 'scraping_app/img/'|add:r.currency_code|add:'.jpg' %}" alt="{{ r.currency_code }}">
+                <div class="news-content">
+                    <h2>{{ r.currency_name }} ({{ r.currency_code }})</h2>
+                    <p>Курс на {{ selected_date }}: <strong>{{ r.rate }}</strong> грн</p>
+                </div>
+            </article>
+            {% empty %}
+            <p>Немає даних для обраної дати та вибраних валют.</p>
+            {% endfor %}
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; {{ now|default:"2025" }} Курс валют | Дані від НБУ</p>
+        </div>
+    </footer>
+</body>
+</html>

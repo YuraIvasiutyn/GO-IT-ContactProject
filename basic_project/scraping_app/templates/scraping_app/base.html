@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Курс валют{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: white;
+        }
+        th, td {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        form {
+            margin-bottom: 1rem;
+        }
+        button {
+            padding: 0.3rem 0.7rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Конвертер та огляд валют</h1>
+    {% block content %}{% endblock %}
+</body>
+</html>
