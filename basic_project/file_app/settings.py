@@ -1,15 +1,12 @@
 import os
 from pathlib import Path
 
-# Шлях до кореня проєкту
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Безпека
 SECRET_KEY = 'django-insecure-заміни-на-свій-ключ'
 DEBUG = True
 ALLOWED_HOSTS = []
 
-# Додатки
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -18,10 +15,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'file_app',  # ← Твій додаток
+    'file_app', 
 ]
 
-# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -32,12 +28,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'myproject.urls'  # ← Замінити на ім'я твого проєкту
+ROOT_URLCONF = 'myproject.urls' 
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # ← якщо шаблони в /templates/
+        'DIRS': [BASE_DIR / 'templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
