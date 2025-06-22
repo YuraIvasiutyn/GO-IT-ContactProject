@@ -1,7 +1,10 @@
 from django import forms
-from .models import File
 
-class FileUploadForm(forms.ModelForm):
-    class Meta:
-        model = File
-        fields = ['file', 'category']  
+class FileUploadForm(forms.Form):
+    file = forms.FileField()
+    category = forms.ChoiceField(choices=[
+        ('image', 'Зображення'),
+        ('document', 'Документ'),
+        ('video', 'Відео'),
+        ('other', 'Інше'),
+    ])
