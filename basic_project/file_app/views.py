@@ -24,3 +24,4 @@ def file_list(request):
     if category:
         files = files.filter(category=category)
     return render(request, 'file_app/file_list.html', {'files': files})
+
