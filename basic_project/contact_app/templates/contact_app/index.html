@@ -1,4 +1,4 @@
-{% extends "contact_app/base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
@@ -20,7 +20,7 @@
            class="btn  btn-outline-danger d-flex justify-content-center align-items-center">Clear</a>
     </div>
 </form>
-<hr>
+
 <table class="table table-hover w-100">
     <thead>
     <tr class="table-primary ">
@@ -93,7 +93,7 @@
     <li class="page-item">
         <a class="page-link"
            href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.days %}days={{ request.GET.days }}&{% endif %}page={{ total }}">
-             {{ total }}</a>
+            {{ total }}</a>
     </li>
     {% endif %}
 
