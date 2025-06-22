@@ -29,3 +29,6 @@ urlpatterns = [
     path('news/', include('scraping_app.urls')),
     path('file/', include('file_app.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
