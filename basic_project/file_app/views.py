@@ -12,10 +12,11 @@ def upload_file(request):
             file_obj = form.save(commit=False)
             file_obj.user = request.user
             file_obj.save()
-            return redirect('file:file_list')
+            return redirect('file_app:file_list')
     else:
         form = FileUploadForm()
     return render(request, 'file_app/upload.html', {'form': form})
+
 
 @login_required
 def file_list(request):
@@ -24,4 +25,3 @@ def file_list(request):
     if category:
         files = files.filter(category=category)
     return render(request, 'file_app/file_list.html', {'files': files})
-
