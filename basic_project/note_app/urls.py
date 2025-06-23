@@ -16,3 +16,4 @@ urlpatterns = [
     path('note/delete/<int:note_id>/', views.note_delete, name='note-delete'),
     # path('note/search/<str:search_text>/', views.notes_search, name='note-search'),
 ]
+

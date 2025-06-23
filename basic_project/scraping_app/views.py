@@ -34,3 +34,4 @@ def currency_view(request):
         "available_currencies": AVAILABLE_CURRENCIES,
         "selected_currencies": currencies
     })
+
