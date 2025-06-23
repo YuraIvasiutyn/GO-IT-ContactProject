@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Завантажити файл</h2>
+  <h2>Upload file</h2>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Завантажити</button>
+    <button type="submit">Upload</button>
   </form>
 
-  <a href="{% url 'file_list' %}">→ Переглянути файли</a>
+  <a href="{% url 'file_app:file_list' %}">→ Go to my files</a>
 
 {% endblock %}
