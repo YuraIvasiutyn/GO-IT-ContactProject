@@ -26,7 +26,10 @@
         <div class="col">
             <div class="card h-100 shadow-sm border-0 hover-card">
                 <div class="card-body">
-                    <h5 class="card-title">📇 Contacts</h5>
+                    <h5 class="card-title">
+                        <i class="bi bi-person-lines-fill me-1"></i>
+                        Contacts
+                    </h5>
                     <p class="card-text">Manage your personal and professional contacts in one place.</p>                    
                     <a href="{% url 'contact_app:main' %}" class="btn btn-primary me-2">View Contacts</a>
                     <a href="{% url 'contact_app:add_contact' %}" class="btn btn-outline-primary btn-sm">➕ Add Contact</a>
@@ -40,6 +43,7 @@
                 <div class="card-body">
                     <h5 class="card-title">📂 File Manager</h5>
                     <p class="card-text">Upload and manage your documents and media files securely.</p>
+
                     <a href="{% url 'upload_file' %}" class="btn btn-primary">Browse Files</a>
                 </div>
             </div>

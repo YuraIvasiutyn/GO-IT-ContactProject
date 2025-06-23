@@ -6,10 +6,13 @@ a.badge.bg-secondary:hover {
 a.badge.bg-secondary {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
-
+/*-----------------------------------------------------*/
+/*базовий стиль карточки*/
 .card {
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   border: 1px solid #838687;
+  overflow: visible; /* дозволяє вспливати меню */
+  z-index: 1;
 }
 
 .card:hover {
@@ -40,19 +43,29 @@ a.badge.bg-secondary {
 /* картка нотатки */
 .note-card {
     transition: box-shadow 0.3s ease;
-    /* transition: all 0.3s ease-in-out; */
-    
-    height: 220px; /* фіксована висота картки */
-    position: relative;
+    transition: background-color 0.3s ease;
+    transition: all 0.3s ease-in-out;
+    background-color: var(--note-color, #dea60c);
+    /*height: 100px;*/ /* фіксована висота картки */
+    height: auto;
+    min-height: 100px; /* щоб виглядали стабільно */
     cursor: pointer;
-    /*overflow: hidden; */
-    overflow: visible; /* дозволяє випливати меню */
+    overflow: visible; /* дозволяє вспливати меню */
+    
+    z-index: 1; /* 1 або auto додаємо фіксоване значення */
+    position: relative;
+}
+
+/* Коли меню відкрите */
+.note-card.active {
+  z-index: 1500;
 }
 
 .note-card:hover {
   box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.2); /* виразна тінь */
-  transform: translateY(-2px); /* легке підняття */
+  transform: translateY(-2px); /* легке підняття*/
   border-color: #0d6efd;
+  z-index: 1; /* 1 або auto додаємо фіксоване значення */
 }
 
 [data-bs-theme="dark"] .note-card:hover {
@@ -65,9 +78,11 @@ a.badge.bg-secondary {
 
 .note-card-body {
     height: 100%;
-    overflow-y: auto;
+    /* overflow-y: auto; */ 
+    overflow: visible; 
     padding: 1rem;
   }
+
 /* ---------------------------------------------------*/
 [data-bs-theme="light"] .central-content {
   background-color: #effcff;
@@ -82,7 +97,12 @@ a.badge.bg-secondary {
   border-radius: 1rem;
   padding: 1.5rem;
   transition: box-shadow 0.3s ease, transform 0.2s ease;
+  
+  position: relativ1e;
+  overflow: visible !important;
+  z-index: 1;
 }
+
 
 /* Додатково — адаптація під темну-світлу тему */
 [data-bs-theme="dark"] .content-card {
@@ -108,8 +128,52 @@ a.badge.bg-secondary {
   background-color: #fff3cd; /* light yellow */
   color: #856404; /* темно-жовтий текст */
 }
-
 .dropdown-item.dropdown-delete:hover {
   background-color: #f8d7da; /* light red */
   color: #721c24; /* темно-червоний текст */
+}
+/* ---------------------------------------------------*/
+/*налаштування дропдаун-меню, шоб воно коректно вспливало поверх карток*/
+.dropdown {
+  position: relative;
+  z-index: 1050 !important;
+  /* z-index: 1050; */ 
+}
+
+.dropdown-menu {
+  z-index: 1055 !important; /* вище за Bootstrap popover, модалки — 1050 */
+  position: absolute;
+  top: 100%;
+  right: 0;
+  will-change: transform; /* для анімацій */
+}
+.row {
+  overflow: visible;
+}
+
+/*
+* {
+  outline: 1px solid red;
+}
+*/
+.note-wrapper {
+  position: relative;
+  z-index: auto; /*1 або auto */
+}
+
+.dropdown-fix {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+}
+
+
+
+.color-btn.selected-light {
+    border: 4px solid #000 !important; /* Чорна рамка для світлої теми */
+}
+
+.color-btn.selected-dark {
+    border: 4px solid #fff !important; /* Біла рамка для темної теми */
 }

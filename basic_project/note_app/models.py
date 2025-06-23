@@ -24,6 +24,7 @@ class Note(models.Model):
     last_modified_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=-1)
+    color = models.CharField(max_length=20, default="#ffffff")
 
     class Meta:
         constraints = [

@@ -29,23 +29,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- Color Picker -->
-                    <div class="mb-4">
-                        <label class="form-label">Choose color:</label>
-                        <input type="hidden" name="color" id="note-color" value="{{ note.color|default:'#dea60c' }}">
-
-                        <div class="d-flex flex-wrap gap-2" id="color-picker">
-                            {% for color in preset_colors %}
-                                <button type="button"
-                                        class="btn border color-btn"
-                                        data-color="{{ color }}"
-                                        style="background-color: {{ color }}; width: 28px; height: 28px;"
-                                        onclick="selectColor('{{ color }}')">
-                                </button>
-                            {% endfor %}
-                        </div>
-                    </div>
-
                     <!-- Tags -->
                     <div class="mb-4">
                         <label for="tags" class="form-label">Select tag(s):</label>

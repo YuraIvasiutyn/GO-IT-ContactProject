@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main, name='main'),
     path('error/<str:message>', views.error, name='error-page'),
-    path('dev-login/', views.dev_login, name='dev-login'),
+    path('dev-login/', views.dev_login, name='dev-login'),  #  тимчасова заглушка поки  не зявитьсянормальна авторизація
 
     path('note/', include('note_app.urls')),
     path('contact_app/', include('contact_app.urls')),
