@@ -8,6 +8,9 @@ cd basic_project
 pip install django
 pip install psycopg2-binary
 pip install django-environ
+pip install whitenoise
+pip install pyuploadcare
+
 ```
 3. застосовуємо міграцію та сворюємо суперкористувача (адміна)
 ```cmd
