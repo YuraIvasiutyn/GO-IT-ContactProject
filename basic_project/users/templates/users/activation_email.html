@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Activate Your Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color:rgb(255, 242, 93);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        a {
+            color:rgb(38, 0, 255);
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h2>👋 Hi {{ user }},</h2>
+
+        <p>Thank you for registering on our <strong>Personal Assistant</strong> web application.</p>
+
+        <p>Please click the button below to activate your account:</p>
+
+        <a href="{{ activation_link }}" class="button">Activate My Account</a>
+
+        <p>If the button doesn’t work, you can also copy and paste this link into your browser:</p>
+        <p><a href="{{ activation_link }}">{{ activation_link }}</a></p>
+
+        <p>If you didn’t register, please ignore this email.</p>
+        <p>— Project Team Group #6</p>
+
+    </div>
+</body>
+</html>
