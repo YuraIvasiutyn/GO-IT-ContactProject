@@ -8,6 +8,7 @@
         <p class="lead text-muted">Manage your notes, contacts, files and scraped data from one place.</p>
     </div>
 
+    {% if user.is_authenticated %}
     <div class="row row-cols-1 row-cols-md-2 g-4">
         <!-- Notes Module -->
         <div class="col">
@@ -61,6 +62,55 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <!-- 🧾 Guest mode -->
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <!-- Notes Info -->
+        <div class="col">
+            <div class="card h-100 border-info shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-info">📝 Notes</h5>
+                    <p class="card-text">Easily write and organize notes with tagging and search support.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Info -->
+        <div class="col">
+            <div class="card h-100 border-success shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">📇 Contacts</h5>
+                    <p class="card-text">Store important contacts and find them quickly when needed.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Info -->
+        <div class="col">
+            <div class="card h-100 border-warning shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">📂 File Manager</h5>
+                    <p class="card-text">Upload and manage your personal files in a safe place.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Info -->
+        <div class="col">
+            <div class="card h-100 border-primary shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">🌐 News</h5>
+                    <p class="card-text">Track the latest exchange rates from the NBU, and follow economic trends.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{% url 'users:signup' %}" class="btn btn-success btn-lg me-3">Sign Up</a>
+        <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+    </div>
+    {% endif %}
 </div>
 
 <style>

@@ -99,8 +99,17 @@
           + перепаблішити аплікейшин сайт
           + вмерджити свої зміни в дев гілку
      
-2025-06-22
+2025-06-25
+     users module
+          + signup template
+          + login template
+          email confirmation
+          not authorized mode
+               check all links & fix them
      причесати код
+     закомітити
+     запаблішити в гілку
+     розгорнути новий білд
      задокументувати
 
 # Bugs
