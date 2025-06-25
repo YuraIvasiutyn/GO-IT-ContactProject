@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinLengthValidator, EmailValidator
@@ -30,9 +31,9 @@ class Contact(models.Model):
         ]
     )
     birthday = models.DateField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='contacts')
 
     def clean(self):
-        # Валідація дати народження
         if self.birthday > date.today():
             raise ValidationError({'birthday': 'Birthday cannot be in the future'})
 
