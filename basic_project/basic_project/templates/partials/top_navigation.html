@@ -16,7 +16,7 @@
           <a class="nav-link {% if request.resolver_match.url_name == 'main' %}active{% endif %}"
              href="{% url 'main' %}">Home</a>
         </li>
-        {% if user.is_authenticated %}        
+        {% if user.is_authenticated %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'note_app' %}active{% endif %}" href="#" id="notesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Notes
@@ -83,15 +83,15 @@
               👤 {{ user.username }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="">Logout</a></li>
+              <li><a class="dropdown-item" href="{% url 'users:logout' %}">Logout</a></li>
             </ul>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="">Sign Up</a>
+            <a class="nav-link" href="{% url 'users:signup' %}">Sign Up</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">Login</a>
+            <a class="nav-link" href="{% url 'users:login' %}">Login</a>
           </li>
         {% endif %}
       </ul>

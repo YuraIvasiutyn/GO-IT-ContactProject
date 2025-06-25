@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "🐍 Django: runserver",
+      "name": ":snake: Django: runserver",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/basic_project/manage.py",
@@ -11,7 +11,7 @@
         "--noreload"  // обов’язково, щоб breakpoint працював!
       ],
       "django": true,
-      "justMyCode": true,      
+      "justMyCode": true,
     }
   ]
 }
