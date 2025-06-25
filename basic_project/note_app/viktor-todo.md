@@ -100,12 +100,12 @@
           + вмерджити свої зміни в дев гілку
      
 2025-06-25
-     users module
+     + users module
           + signup template
           + login template
+     ? fix bug with contacts for other users
+          check all links & fix them - for not authorized mode
           email confirmation
-          not authorized mode
-               check all links & fix them
      причесати код
      закомітити
      запаблішити в гілку

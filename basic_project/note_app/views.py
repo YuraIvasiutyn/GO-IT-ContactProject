@@ -109,14 +109,10 @@ def main(request):
         )
 
 
-# @login_required
+@login_required
 # створення тегу
 def tag(request):
     my_tags = Tag.objects.filter(user=request.user).all().order_by("id")
-    # if not request.user.is_authenticated:
-    #    my_tags = Tag.objects.filter(user=request.user).all()
-    # else:
-    #    my_tags = Tag.objects.filter(user_id=4).all()
 
     if request.method == 'POST':
         form = TagForm(request.POST)
