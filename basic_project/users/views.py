@@ -5,6 +5,7 @@ from .forms import RegisterForm, LoginForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
+
 def signupuser(request):
     if request.user.is_authenticated:
         return redirect(to='main')
@@ -42,13 +43,3 @@ def loginuser(request):
 def logoutuser(request):
     logout(request)
     return redirect(to='main')
-
-
-
-
-
-
-
-
-
-

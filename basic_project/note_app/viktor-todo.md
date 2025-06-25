@@ -106,6 +106,7 @@
      ? fix bug with contacts for other users
           check all links & fix them - for not authorized mode
           email confirmation
+     зараз в .env файлі 2 однакових SECRET_KEY (один для джанго, 2й для завантаження файлів в клауд), я якийсь мабуть прейменую, щоб не було конфіліктів імен.
      причесати код
      закомітити
      запаблішити в гілку

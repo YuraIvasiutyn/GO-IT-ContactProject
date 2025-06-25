@@ -5,7 +5,6 @@ from django.db.models import Count
 
 from django.db.models import Q
 
-
 from .forms import TagForm, NoteForm
 from .models import Tag, Note
 
@@ -37,16 +36,20 @@ def count_top_tags(number_of_tags=10, min_font_size=10, max_font_size=28):
         if max_val > min_val:
             # Масштабуємо розмір шрифту
             scale = (tag.cnt - min_val) / (max_val - min_val)
-            tag.font_size = int(min_font_size + (max_font_size - min_font_size) * scale)
+            tag.font_size = int(
+                min_font_size + (max_font_size - min_font_size) * scale
+            )
         else:
-            # Якщо всі теги мають однакову частоту, встановлюємо мінімальний розмір
+            # Якщо всі теги мають однакову частоту
+            # встановлюємо мінімальний розмір
             tag.font_size = max_font_size
 
     return top_tags
 
 
 def get_notes_on_page(request) -> int:
-    # Отримуємо кількість notes на сторінку з параметра GET (за замовчуванням 5)
+    # Отримуємо кількість notes на сторінку з параметра GET
+    # за замовчуванням 5
     notes_per_page = request.GET.get('notes_per_page', 5)
     try:
         notes_per_page = int(notes_per_page)
@@ -92,9 +95,12 @@ def main(request):
         )
     else:
         # Додаємо пагінацію (наприклад, X notes на сторінку)
-        paginator = Paginator(notes, notes_on_page)  # 5 notes на сторінку
-        page_number = request.GET.get('page')  # Отримуємо номер сторінки з параметра GET
-        page_obj = paginator.get_page(page_number)  # Отримуємо об'єкт сторінки
+        # 5 notes на сторінку
+        paginator = Paginator(notes, notes_on_page)
+        # Отримуємо номер сторінки з параметра GET
+        page_number = request.GET.get('page')
+        # Отримуємо об'єкт сторінки
+        page_obj = paginator.get_page(page_number)
 
         # Передаємо об'єкт сторінки в шаблон
         return render(
@@ -147,7 +153,8 @@ def tag(request):
 def edit_tag(request, tag_id):
     tag = Tag.objects.filter(pk=tag_id, user=request.user).first()
     if not tag:
-        return redirect_to_error(request, f"Tag with id={tag_id} not found or not yours.")
+        msg = f"Tag with id={tag_id} not found or not yours."
+        return redirect_to_error(request, msg)
 
     if request.method == 'POST':
         form = TagForm(request.POST, instance=tag)
@@ -183,7 +190,8 @@ def note(request, note_id=None):
             # form = NoteForm(request.POST, instance=note)
             note = Note.objects.filter(pk=note_id, user=request.user).first()
             if not note:
-                return redirect_to_error(f"Note (id={note_id}) is not found or not yours.")
+                msg = f"Note (id={note_id}) is not found or not yours."
+                return redirect_to_error(msg)
             form = NoteForm(request.POST, instance=note)
         else:
             # створення нової note
@@ -243,7 +251,9 @@ def note_detail(request, note_id):
     # note = get_object_or_404(Note, pk=note_id)
     note = Note.objects.filter(pk=note_id, user=request.user).first()
     if not note or note.user != request.user:
-        msg = f"Note (id={note_id}) does not belong to the '{request.user}' user --> You can't see details here."
+        msg = f"""Note (id={note_id}) does not belong
+            to the '{request.user}' user --> You can't see details here.
+            """
         return redirect_to_error(request, msg)
     return render(request, 'note_app/note_detail.html', {"note": note})
 
@@ -261,7 +271,9 @@ def note_delete(request, note_id):
         n.delete()
         return redirect(to='note_app:note-main')
     else:
-        msg = f"Can't delete note. Note (id={note_id}) does not belong to your account or not existing."
+        msg = f"""Can't delete note. Note (id={note_id}) does not belong
+        to your account or not existing.
+        """
         return redirect_to_error(request, msg)
 
 
@@ -269,11 +281,11 @@ def note_delete(request, note_id):
 def search_by_tag(request, tag_name):
     notes_on_page = get_notes_on_page(request)
     # tag = get_object_or_404(Tag, name=tag_name)
-    tag = Tag.objects.filter(name=tag_name).first()
+    tag = Tag.objects.filter(user=request.user, name=tag_name).first()
     if not tag:
-        msg = f"Tag ['{tag_name}'] is not found."
+        msg = f"Tag ['{tag_name}'] is not found or not yours."
         return redirect_to_error(request, msg)
-    notes = Note.objects.filter(tags=tag).all()
+    notes = Note.objects.filter(user=request.user, tags=tag).all()
 
     # Отримуємо топ-10 тегів за кількістю використань
     top_tags = count_top_tags()
@@ -329,7 +341,8 @@ def update_note_color(request, note_id):
 def delete_tag(request, tag_id):
     tag = Tag.objects.filter(pk=tag_id, user=request.user).first()
     if not tag:
-        return redirect_to_error(request, f"Tag with id={tag_id} not found or not yours.")
+        msg = f"Tag with id={tag_id} not found or not yours."
+        return redirect_to_error(request, msg)
     # Перевірка: чи прив'язаний тег до нотаток
     if tag.note_set.exists():
         msg = f"Cannot delete tag '{tag.name}' because it is used in notes."

@@ -3,8 +3,6 @@ from django.urls import path, include
 from . import views
 
 
-
-
 app_name = 'file_app'
 
 urlpatterns = [
