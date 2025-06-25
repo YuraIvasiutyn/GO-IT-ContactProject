@@ -16,7 +16,7 @@
           <a class="nav-link {% if request.resolver_match.url_name == 'main' %}active{% endif %}"
              href="{% url 'main' %}">Home</a>
         </li>
-        {% if user.is_authenticated %}        
+        {% if user.is_authenticated %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'note_app' %}active{% endif %}" href="#" id="notesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Notes

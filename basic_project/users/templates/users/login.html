@@ -1,64 +1,67 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<h2 class="h2">Login</h2>
-<form method="post" action="{% url 'users:login' %}">
-    {% csrf_token %}
-    {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-            {{ form.non_field_errors }}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">🔐 Login</h2>
+                    <form method="post" action="{% url 'users:login' %}">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                            <input type="text"
+                                   name="username"
+                                   id="{{ form.username.id_for_label }}"
+                                   value="{{ form.username.value|default:'' }}"
+                                   class="form-control"
+                                   placeholder="Enter your username"
+                                   autocomplete="username"
+                                   required>
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                            <input type="password"
+                                   name="password"
+                                   id="{{ form.password.id_for_label }}"
+                                   class="form-control"
+                                   placeholder="Enter your password"
+                                   autocomplete="current-password"
+                                   required>
+                            {% if form.password.errors %}
+                                <div class="text-danger small">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-center text-muted">
+                        Don't have an account yet?
+                        <a href="{% url 'users:signup' %}" class="text-decoration-none">Sign up</a>
+                    </p>
+                </div>
+            </div>
         </div>
-    {% endif %}
-    <div class="form-group autocomp">
-        {{ form.username.label_tag }}
-        {{ form.username }}
-        {% if form.username.errors %}
-            <div class="text-danger">{{ form.username.errors }}</div>
-        {% endif %}
     </div>
-    <div class="form-group password-input">
-        {{ form.password.label_tag }}
-        {{ form.password }}
-        {% if form.password.errors %}
-            <div class="text-danger">{{ form.password.errors }}</div>
-        {% endif %}
-    </div>
-    <div class="button">
-        <button type="submit" class="btn btn-primary">Login</button>
-    </div>
-</form>
-
-
-
-
-
-
-
-
-<style>
-    .password_window{
-        margin-left: 523px;
-        margin-top: 0px;
-    }
-
-    .button{
-        margin-left: 586px;
-        margin-top: 10px;
-    }
-
-    .autocomp_1{
-        margin-left: 40%;
-        margin-top: 25px;
-    }
-
-    .autocomp{
-        margin-left: 40%;
-        margin-top: 30px;
-    }
-
-    .h2{
-        margin-left: 44%;
-    }
-</style>
-
+</div>
 {% endblock %}
