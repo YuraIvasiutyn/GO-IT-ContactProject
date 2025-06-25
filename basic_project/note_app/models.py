@@ -19,7 +19,12 @@ class Tag(models.Model):
 
 class Note(models.Model):
     note_title = models.CharField(max_length=500, null=False, blank=False)
-    note = models.CharField(max_length=5000, null=True, unique=False, blank=True)
+    note = models.CharField(
+        max_length=5000,
+        null=True,
+        unique=False,
+        blank=True
+    )
     created = models.DateTimeField(auto_now_add=True)
     last_modified_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag)

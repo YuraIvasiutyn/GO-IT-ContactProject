@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 app_name = 'note_app'
 
 urlpatterns = [
@@ -14,5 +15,4 @@ urlpatterns = [
     path('note/edit/<int:note_id>/', views.note, name='note-edit'),
     path('note/color/<int:note_id>/', views.update_note_color, name='note-color-update'),
     path('note/delete/<int:note_id>/', views.note_delete, name='note-delete'),
-    # path('note/search/<str:search_text>/', views.notes_search, name='note-search'),
 ]

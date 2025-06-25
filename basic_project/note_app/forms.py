@@ -1,10 +1,16 @@
 from django.forms import ModelForm, CharField, TextInput, Textarea
-#, DateField, DateInput, HiddenInput, IntegerField
+#  , DateField, DateInput, HiddenInput, IntegerField
 from .models import Tag, Note
-from django import forms
+# from django import forms
+
 
 class TagForm(ModelForm):
-    name = CharField(min_length=1, max_length=50, required=True, widget=TextInput())
+    name = CharField(
+        min_length=1,
+        max_length=50,
+        required=True,
+        widget=TextInput()
+    )
 
     class Meta:
         model = Tag

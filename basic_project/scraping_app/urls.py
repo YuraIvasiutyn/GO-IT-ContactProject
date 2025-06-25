@@ -7,4 +7,3 @@ app_name = 'news'
 urlpatterns = [
     path('', views.currency_view, name='main'),
 ]
-
