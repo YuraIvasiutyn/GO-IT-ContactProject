@@ -13,8 +13,8 @@ def main(request):
     days = request.GET.get('days', '')
     print("days", days)
     print("query", query)
-    contacts = Contact.objects.all()
-    # contacts = Contact.objects.filter(user=request.user).all()
+    # contacts = Contact.objects.all()
+    contacts = Contact.objects.filter(user=request.user).all()
 
     if query:
         contacts = contacts.filter(
@@ -60,6 +60,7 @@ def add_contact(request):
     if request.method == 'POST':
         form = AddContactForm(request.POST, instance=Contact())
         if form.is_valid():
+            form.instance.user = request.user
             form.save()
             return redirect(to='contact_app:main')
     return render(request, template_name='contact_app/add_contact.html', context={'title': 'Add contact', 'form': form})
