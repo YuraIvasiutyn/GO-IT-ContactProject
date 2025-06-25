@@ -8,6 +8,7 @@ from .currency_fetcher import get_rates_by_date
 
 AVAILABLE_CURRENCIES = ['USD', 'EUR', 'PLN', 'GBP', 'CHF', 'CZK', 'SEK', 'NOK']
 
+
 # Create your views here.
 def currency_view(request):
     date_str = request.GET.get('date')
@@ -34,4 +35,3 @@ def currency_view(request):
         "available_currencies": AVAILABLE_CURRENCIES,
         "selected_currencies": currencies
     })
-

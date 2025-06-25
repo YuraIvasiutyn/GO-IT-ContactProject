@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main, name='main'),
     path('error/<str:message>', views.error, name='error-page'),
-    path('dev-login/', views.dev_login, name='dev-login'),  #  тимчасова заглушка поки  не зявитьсянормальна авторизація
+    # path('dev-login/', views.dev_login, name='dev-login'),  #  тимчасова заглушка поки  не зявитьсянормальна авторизація
 
     path('note/', include('note_app.urls')),
     path('contact_app/', include('contact_app.urls')),
@@ -33,9 +33,3 @@ urlpatterns = [
     path('file/', include('file_app.urls')),
     path('users/', include('users.urls'))
 ]
-
-# if settings.DEBUG:
-#    urlpatterns += static(
-#        settings.MEDIA_URL,
-#        document_root=settings.MEDIA_ROOT
-#    )

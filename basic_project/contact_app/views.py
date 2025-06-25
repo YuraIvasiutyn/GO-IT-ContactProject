@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.core.paginator import Paginator
 from datetime import date, timedelta
@@ -6,14 +7,14 @@ from .models import Contact
 from .forms import QueryForm, AddContactForm
 
 
-# Create your views here.
-
+@login_required
 def main(request):
     query = request.GET.get('query', '')
     days = request.GET.get('days', '')
     print("days", days)
     print("query", query)
     contacts = Contact.objects.all()
+    # contacts = Contact.objects.filter(user=request.user).all()
 
     if query:
         contacts = contacts.filter(
@@ -53,6 +54,7 @@ def main(request):
     })
 
 
+@login_required
 def add_contact(request):
     form = AddContactForm(instance=Contact())
     if request.method == 'POST':
@@ -63,6 +65,7 @@ def add_contact(request):
     return render(request, template_name='contact_app/add_contact.html', context={'title': 'Add contact', 'form': form})
 
 
+@login_required
 def edit_contact(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
     if request.method == 'POST':
@@ -75,6 +78,7 @@ def edit_contact(request, pk):
     return render(request, 'contact_app/edit_contact.html', {'form': form, 'title': 'Edit Contact'})
 
 
+@login_required
 def delete_contact(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
     if request.method == 'POST':
