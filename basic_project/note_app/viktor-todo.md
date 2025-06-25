@@ -106,8 +106,9 @@
      ? fix bug with contacts for other users
           check all links & fix them - for not authorized mode
           email confirmation
-     зараз в .env файлі 2 однакових SECRET_KEY (один для джанго, 2й для завантаження файлів в клауд), я якийсь мабуть прейменую, щоб не було конфіліктів імен.
-     причесати код
+     + зараз в .env файлі 2 однакових SECRET_KEY (один для джанго, 2й для завантаження файлів в клауд), я якийсь мабуть прейменую, щоб не було конфіліктів імен.
+     + причесати код
+     
      закомітити
      запаблішити в гілку
      розгорнути новий білд
@@ -125,7 +126,7 @@
 + видалення неіснуюючої нотатки
      http://localhost:8000/note/note/delete/100/
 + спроба редагувати неіснуючу нотатку
-     http://localhost:8000/note/note/edit/100
+     http://localhost:8000/note/note/edit/1
      http://localhost:8000/note/note/edit/sdfsdfdsf
 + спроба проапдейтити колір в неіснуючій нотатці
      http://localhost:8000/note/note/color/100
