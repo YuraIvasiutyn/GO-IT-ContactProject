@@ -78,6 +78,10 @@ https://goit-final-project-zpg5.onrender.com/dev-login
 Django super user
 user: viktor
 pass: 123456
+
+regular user
+user: viktor2
+pass: test-123456
 ---------------------------------
 # REQS
 + Зберігати нотатки з текстовою інформацією;

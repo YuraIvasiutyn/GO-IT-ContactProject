@@ -51,12 +51,22 @@ def signupuser(request):
             user.is_active = False
             user.save()
             send_activation_email(request, user)
-            return redirect(to='main')
+            # return redirect(to='main')
+            return redirect('users:signup-success')
         else:
-            print(":x: Signup Form Errors:", form.errors)
+            # не валідна форма - повертаємося до реєстрації
+            # print(":x: Signup Form Errors:", form.errors)
             return render(request, 'users/signup.html', context={"form": form})
 
-    return render(request, 'users/signup.html', context={"form": RegisterForm()})
+    return render(
+        request,
+        'users/signup.html',
+        context={"form": RegisterForm()}
+    )
+
+
+def signup_success(request):
+    return render(request, 'users/signup_success.html')
 
 
 def loginuser(request):
