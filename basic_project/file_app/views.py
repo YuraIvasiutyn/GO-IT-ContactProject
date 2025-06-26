@@ -1,23 +1,22 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-
+from django.conf import settings
 from .models import File
-from .forms import FileUploadForm
+# from .forms import FileUploadForm
 
 
 @login_required
 def upload_file(request):
     if request.method == 'POST':
-        form = FileUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            file_obj = form.save(commit=False)
-            file_obj.user = request.user
-            file_obj.save()
-            return redirect('file_list')
-    else:
-        form = FileUploadForm()
-    
-    return render(request, 'file_app/upload.html', {'form': form})
+        file_url = request.POST.get('file')
+        category = request.POST.get('category')
+        if file_url and category:
+            File.objects.create(user=request.user, file=file_url, category=category)
+            return redirect('file_app:file_list')
+    return render(request, 'file_app/upload.html', {
+        'uploadcare_public_key': settings.UPLOADCARE_PUBLIC_KEY
+    })
+
 
 
 @login_required

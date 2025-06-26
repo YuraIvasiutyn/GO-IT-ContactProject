@@ -1,0 +1,36 @@
+{% extends "note_app/base.html" %}
+
+{% block content %}
+
+<form method="POST" action="{% if form.instance.pk %}{% url 'note_app:note-edit' form.instance.pk %}{% else %}{% url 'note_app:note' %}{% endif %}">
+    {% csrf_token %}
+    <div style="padding: 10px">
+        <label> Title:
+            {{ form.note_title }}
+        </label>
+        <span>{{ form.errors.name }}</span>
+    </div>
+
+    <div style="padding: 10px">
+        <label> note:
+            {{ form.note }}
+        </label>
+        <span>{{ form.errors.name }}</span>
+    </div>
+    <div style="padding: 10px">
+        <label> Select tags:
+            <select name="tags" multiple="multiple" required>
+                {% for tag in tags %}
+                <option value="{{tag.name}}"
+                {% if note and tag in note.tags.all %}selected{% endif %}>
+                {{tag.name}}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+    <div class="grid">
+        <button type="submit">Submit</button>
+        <button type="reset" class="secondary">Reset</button>
+    </div>
+</form>
+{% endblock %}

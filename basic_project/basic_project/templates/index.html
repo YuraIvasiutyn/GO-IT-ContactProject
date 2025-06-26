@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">🧠 Personal Assistant Dashboard</h1>
+        <p class="lead text-muted">Manage your notes, contacts, files and scraped data from one place.</p>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <!-- Notes Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">📝 Notes</h5>
+                    <p class="card-text">Create and organize your personal notes with tags.</p>
+                    <a href="{% url 'note_app:note-main' %}" class="btn btn-primary me-2">View Notes</a>
+                    <a href="{% url 'note_app:note' %}" class="btn btn-outline-primary btn-sm">➕ Add Note</a>
+                    <a href="{% url 'note_app:note-tag' %}" class="btn btn-outline-secondary btn-sm">🏷️ Add Tag</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-person-lines-fill me-1"></i>
+                        Contacts
+                    </h5>
+                    <p class="card-text">Manage your personal and professional contacts in one place.</p>                    
+                    <a href="{% url 'contact_app:main' %}" class="btn btn-primary me-2">View Contacts</a>
+                    <a href="{% url 'contact_app:add_contact' %}" class="btn btn-outline-primary btn-sm">➕ Add Contact</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">📂 File Manager</h5>
+                    <p class="card-text">Upload and manage your documents and media files securely.</p>
+
+                    <a href="{% url 'file_app:file_list' %}" class="btn btn-primary">Browse Files</a>
+                    <a href="{% url 'file_app:upload_file' %}" class="btn btn-outline-primary btn-sm">➕ Add File</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scraping Module -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <h5 class="card-title">🌐 News</h5>
+                    <p class="card-text">Check the latest exchange rates and track currency trends with up-to-date data from the National Bank of Ukraine.</p>
+                    <a href="{% url 'news:main' %}" class="btn btn-primary">Open News</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- 🧾 Guest mode -->
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <!-- Notes Info -->
+        <div class="col">
+            <div class="card h-100 border-info shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-info">📝 Notes</h5>
+                    <p class="card-text">Easily write and organize notes with tagging and search support.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Info -->
+        <div class="col">
+            <div class="card h-100 border-success shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">📇 Contacts</h5>
+                    <p class="card-text">Store important contacts and find them quickly when needed.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Info -->
+        <div class="col">
+            <div class="card h-100 border-warning shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">📂 File Manager</h5>
+                    <p class="card-text">Upload and manage your personal files in a safe place.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Info -->
+        <div class="col">
+            <div class="card h-100 border-primary shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">🌐 News</h5>
+                    <p class="card-text">Track the latest exchange rates from the NBU, and follow economic trends.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{% url 'users:signup' %}" class="btn btn-success btn-lg me-3">Sign Up</a>
+        <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.hover-card:hover {
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+    transition: all 0.3s ease-in-out;
+}
+</style>
+{% endblock %}

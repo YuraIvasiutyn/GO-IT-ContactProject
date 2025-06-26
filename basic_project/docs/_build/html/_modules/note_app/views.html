@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>note_app.views &#8212; Personal_Assistant 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=279e0f84" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Personal_Assistant 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">note_app.views</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for note_app.views</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Views for the Notes application.</span>
+
+<span class="sd">This module provides view functions for managing notes and tags, including:</span>
+<span class="sd">- creating, editing, and deleting notes and tags</span>
+<span class="sd">- displaying notes with pagination and tag filters</span>
+<span class="sd">- assigning colors to notes</span>
+<span class="sd">- calculating top used tags with font size scaling</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">----------</span>
+<span class="sd">- redirect_to_error</span>
+<span class="sd">- count_top_tags</span>
+<span class="sd">- get_notes_on_page</span>
+<span class="sd">- main</span>
+<span class="sd">- tag</span>
+<span class="sd">- edit_tag</span>
+<span class="sd">- note</span>
+<span class="sd">- note_detail</span>
+<span class="sd">- note_delete</span>
+<span class="sd">- search_by_tag</span>
+<span class="sd">- update_note_color</span>
+<span class="sd">- delete_tag</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>  <span class="c1"># , get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.paginator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Paginator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Count</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">TagForm</span><span class="p">,</span> <span class="n">NoteForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">Note</span>
+
+
+<span class="n">preset_colors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;#0011ff&quot;</span><span class="p">,</span> <span class="s2">&quot;#017066&quot;</span><span class="p">,</span> <span class="s2">&quot;#878686&quot;</span><span class="p">,</span> <span class="s2">&quot;#7BB002&quot;</span><span class="p">,</span> <span class="s2">&quot;#dea60c&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;#FF002B&quot;</span><span class="p">,</span> <span class="s2">&quot;#c723b1&quot;</span><span class="p">,</span> <span class="s2">&quot;#9496f7&quot;</span><span class="p">,</span> <span class="s2">&quot;#ff6b02&quot;</span><span class="p">,</span> <span class="s2">&quot;#7e802d&quot;</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="redirect_to_error">
+<a class="viewcode-back" href="../../notes.html#note_app.views.redirect_to_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Redirect to the generic error page with a custom message.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param message: Error message to display.</span>
+<span class="sd">    :return: Rendered error template.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;error.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="count_top_tags">
+<a class="viewcode-back" href="../../notes.html#note_app.views.count_top_tags">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">count_top_tags</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">number_of_tags</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">min_font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_font_size</span><span class="o">=</span><span class="mi">28</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Count and return top tags used by the user with dynamic font sizes.</span>
+
+<span class="sd">    :param user: The user whose tags should be analyzed.</span>
+<span class="sd">    :param number_of_tags: Number of top tags to retrieve. Default = 10.</span>
+<span class="sd">    :param min_font_size: Minimum font size. Default = 10</span>
+<span class="sd">    :param max_font_size: Maximum font size. Default = 28</span>
+
+<span class="sd">    :return: List of top Tag objects with font_size attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Отримуємо топ-10 тегів за кількістю використань</span>
+    <span class="n">top_tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+        <span class="c1"># cnt=Count(&#39;note&#39;)</span>
+        <span class="n">cnt</span><span class="o">=</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;note&#39;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">Q</span><span class="p">(</span><span class="n">note__user</span><span class="o">=</span><span class="n">user</span><span class="p">))</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-cnt&#39;</span><span class="p">)[:</span><span class="n">number_of_tags</span><span class="p">]</span>
+    <span class="c1"># Визначаємо мінімальне та максимальне значення використання</span>
+    <span class="k">if</span> <span class="n">top_tags</span><span class="p">:</span>
+        <span class="n">max_val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">cnt</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">top_tags</span><span class="p">)</span>
+        <span class="n">min_val</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">cnt</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">top_tags</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">max_val</span> <span class="o">=</span> <span class="n">min_val</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># розраховуємо розмір шрифту до кожного тегу</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">top_tags</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">max_val</span> <span class="o">&gt;</span> <span class="n">min_val</span><span class="p">:</span>
+            <span class="c1"># Масштабуємо розмір шрифту</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">cnt</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_val</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="n">min_font_size</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_font_size</span> <span class="o">-</span> <span class="n">min_font_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Якщо всі теги мають однакову частоту</span>
+            <span class="c1"># встановлюємо мінімальний розмір</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">max_font_size</span>
+
+    <span class="k">return</span> <span class="n">top_tags</span></div>
+
+
+
+<div class="viewcode-block" id="get_notes_on_page">
+<a class="viewcode-back" href="../../notes.html#note_app.views.get_notes_on_page">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_notes_on_page</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get number of notes per page from GET parameter.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :return: Integer number of notes per page (default is 5).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Отримуємо кількість notes на сторінку з параметра GET</span>
+    <span class="c1"># за замовчуванням 5</span>
+    <span class="n">notes_per_page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notes_per_page&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">notes_per_page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">notes_per_page</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="c1"># Якщо значення некоректне, використовуємо 5</span>
+        <span class="n">notes_per_page</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Якщо значення некоректне, використовуємо 5</span>
+    <span class="k">return</span> <span class="n">notes_per_page</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../notes.html#note_app.views.main">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Display main notes dashboard with pagination, sorting and search support.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :return: Rendered index template with notes and tag cloud.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">search_query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">notes_on_page</span> <span class="o">=</span> <span class="n">get_notes_on_page</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">sort_order</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">notes</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">notes</span> <span class="ow">and</span> <span class="n">search_query</span><span class="p">:</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">notes</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">note__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span>
+            <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">note_title__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sort_order</span> <span class="o">==</span> <span class="s2">&quot;asc&quot;</span><span class="p">:</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">notes</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;note_title&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sort_order</span> <span class="o">==</span> <span class="s2">&quot;desc&quot;</span><span class="p">:</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">notes</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-note_title&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Отримуємо топ-10 тегів за кількістю використань</span>
+    <span class="n">top_tags</span> <span class="o">=</span> <span class="n">count_top_tags</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="c1"># Отримуємо всі notes, які належать користувачу</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">notes</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">notes_on_page</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s1">&#39;note_app/index.html&#39;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;page_obj&quot;</span><span class="p">:</span> <span class="n">notes</span><span class="p">,</span>
+                <span class="s2">&quot;top_tags&quot;</span><span class="p">:</span> <span class="n">top_tags</span><span class="p">,</span>
+                <span class="s1">&#39;notes_per_page&#39;</span><span class="p">:</span> <span class="n">notes_on_page</span><span class="p">,</span>
+                <span class="s1">&#39;preset_colors&#39;</span><span class="p">:</span> <span class="n">preset_colors</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Додаємо пагінацію (наприклад, X notes на сторінку)</span>
+        <span class="c1"># 5 notes на сторінку</span>
+        <span class="n">paginator</span> <span class="o">=</span> <span class="n">Paginator</span><span class="p">(</span><span class="n">notes</span><span class="p">,</span> <span class="n">notes_on_page</span><span class="p">)</span>
+        <span class="c1"># Отримуємо номер сторінки з параметра GET</span>
+        <span class="n">page_number</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span>
+        <span class="c1"># Отримуємо об&#39;єкт сторінки</span>
+        <span class="n">page_obj</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">get_page</span><span class="p">(</span><span class="n">page_number</span><span class="p">)</span>
+
+        <span class="c1"># Передаємо об&#39;єкт сторінки в шаблон</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s1">&#39;note_app/index.html&#39;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;page_obj&quot;</span><span class="p">:</span> <span class="n">page_obj</span><span class="p">,</span>
+                <span class="s2">&quot;top_tags&quot;</span><span class="p">:</span> <span class="n">top_tags</span><span class="p">,</span>
+                <span class="s1">&#39;notes_per_page&#39;</span><span class="p">:</span> <span class="n">notes_on_page</span><span class="p">,</span>
+                <span class="s1">&#39;preset_colors&#39;</span><span class="p">:</span> <span class="n">preset_colors</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="tag">
+<a class="viewcode-back" href="../../notes.html#note_app.views.tag">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="c1"># створення тегу</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tag</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create new tag or show form for creating tag.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :return: Rendered tag creation template.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">my_tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">TagForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="s1">&#39;note_app:note-main&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># not valid form --&gt; render again</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s1">&#39;note_app/tag.html&#39;</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                    <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="n">my_tags</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+    <span class="c1"># get request</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s1">&#39;note_app/tag.html&#39;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">TagForm</span><span class="p">(),</span>
+            <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="n">my_tags</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="edit_tag">
+<a class="viewcode-back" href="../../notes.html#note_app.views.edit_tag">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">edit_tag</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tag_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Edit existing tag belonging to current user.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param tag_id: ID of the tag to be edited.</span>
+<span class="sd">    :return: Rendered tag edit template or redirect.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">tag_id</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tag with id=</span><span class="si">{</span><span class="n">tag_id</span><span class="si">}</span><span class="s2"> not found or not yours.&quot;</span>
+        <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">TagForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;note_app:note-tag&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">TagForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+
+    <span class="n">my_tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s1">&#39;note_app/tag.html&#39;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+            <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="n">tag</span><span class="p">,</span>
+            <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="n">my_tags</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="note">
+<a class="viewcode-back" href="../../notes.html#note_app.views.note">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">note</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">note_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create or edit a note.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param note_id: Optional ID of the note to edit.</span>
+
+<span class="sd">    :return: Rendered note creation/edit template or redirect.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">note</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;POST request - </span><span class="si">{</span><span class="n">note_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">note_id</span><span class="p">:</span>
+            <span class="c1"># редагування</span>
+            <span class="c1"># note = get_object_or_404(Note, pk=note_id, user=request.user)</span>
+            <span class="c1"># form = NoteForm(request.POST, instance=note)</span>
+            <span class="n">note</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">note_id</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">note</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Note (id=</span><span class="si">{</span><span class="n">note_id</span><span class="si">}</span><span class="s2">) is not found or not yours.&quot;</span>
+                <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">NoteForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># створення нової note</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">NoteForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;#dea60c&quot;</span><span class="p">)</span>
+            <span class="n">new_note</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">new_note</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="n">new_note</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">new_note</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="c1"># add tags to notes (many to many --&gt; stored in separate table)</span>
+            <span class="n">choice_tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">name__in</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">),</span>
+                <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">choice_tags</span><span class="o">.</span><span class="n">iterator</span><span class="p">():</span>
+                <span class="n">new_note</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="s1">&#39;note_app:note-main&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># якщо форма не валідна, повертаємо її знову а режимі редагування</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s1">&#39;note_app/note.html&#39;</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="n">tags</span><span class="p">,</span>
+                    <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                    <span class="s1">&#39;note&#39;</span><span class="p">:</span> <span class="n">note</span><span class="p">,</span>
+                    <span class="s1">&#39;preset_colors&#39;</span><span class="p">:</span> <span class="n">preset_colors</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Якщо GET-запит, створюємо форму для редагування або створення</span>
+        <span class="k">if</span> <span class="n">note_id</span><span class="p">:</span>
+            <span class="n">note</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">note_id</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">NoteForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">note</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">NoteForm</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s1">&#39;note_app/note.html&#39;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="n">tags</span><span class="p">,</span>
+                <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                <span class="s1">&#39;note&#39;</span><span class="p">:</span> <span class="n">note</span><span class="p">,</span>
+                <span class="s1">&#39;preset_colors&#39;</span><span class="p">:</span> <span class="n">preset_colors</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="note_detail">
+<a class="viewcode-back" href="../../notes.html#note_app.views.note_detail">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">note_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">note_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View note details.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param note_id: ID of the note.</span>
+
+<span class="sd">    :return: Rendered detail template or error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># note = get_object_or_404(Note, pk=note_id)</span>
+    <span class="n">note</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">note_id</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">note</span> <span class="ow">or</span> <span class="n">note</span><span class="o">.</span><span class="n">user</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Note (id=</span><span class="si">{</span><span class="n">note_id</span><span class="si">}</span><span class="s2">) does not belong</span>
+<span class="s2">            to the &#39;</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="si">}</span><span class="s2">&#39; user --&gt; You can&#39;t see details here.</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;note_app/note_detail.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="n">note</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="note_delete">
+<a class="viewcode-back" href="../../notes.html#note_app.views.note_delete">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">note_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">note_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete a note if it belongs to the current user.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param note_id: ID of the note.</span>
+
+<span class="sd">    :return: Redirect or error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">pk</span><span class="o">=</span><span class="n">note_id</span><span class="p">,</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="c1"># print(f&quot;note: {q}&quot;)</span>
+
+    <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
+        <span class="c1"># якщо note належить користувачу, то видаляємо її</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="s1">&#39;note_app:note-main&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Can&#39;t delete note. Note (id=</span><span class="si">{</span><span class="n">note_id</span><span class="si">}</span><span class="s2">) does not belong</span>
+<span class="s2">        to your account or not existing.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="search_by_tag">
+<a class="viewcode-back" href="../../notes.html#note_app.views.search_by_tag">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">search_by_tag</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Search notes by tag for current user.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param tag_name: Name of the tag.</span>
+
+<span class="sd">    :return: Rendered tag-filtered notes template.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">notes_on_page</span> <span class="o">=</span> <span class="n">get_notes_on_page</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="c1"># tag = get_object_or_404(Tag, name=tag_name)</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">tag_name</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tag [&#39;</span><span class="si">{</span><span class="n">tag_name</span><span class="si">}</span><span class="s2">&#39;] is not found or not yours.&quot;</span>
+        <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="c1"># Отримуємо топ-10 тегів за кількістю використань</span>
+    <span class="n">top_tags</span> <span class="o">=</span> <span class="n">count_top_tags</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">notes</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">notes_on_page</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s1">&#39;note_app/notes_by_tag.html&#39;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="n">tag</span><span class="p">,</span>
+                <span class="s2">&quot;page_obj&quot;</span><span class="p">:</span> <span class="n">notes</span><span class="p">,</span>
+                <span class="s2">&quot;top_tags&quot;</span><span class="p">:</span> <span class="n">top_tags</span><span class="p">,</span>
+                <span class="s1">&#39;notes_per_page&#39;</span><span class="p">:</span> <span class="n">notes_on_page</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Додаємо пагінацію (наприклад, 10 notes на сторінку)</span>
+        <span class="n">paginator</span> <span class="o">=</span> <span class="n">Paginator</span><span class="p">(</span><span class="n">notes</span><span class="p">,</span> <span class="n">notes_on_page</span><span class="p">)</span>
+        <span class="c1"># Отримуємо номер сторінки з параметра GET</span>
+        <span class="n">page_number</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span>
+        <span class="c1"># Отримуємо об&#39;єкт сторінки</span>
+        <span class="n">page_obj</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">get_page</span><span class="p">(</span><span class="n">page_number</span><span class="p">)</span>
+        <span class="c1"># Передаємо notes та тег у шаблон</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s1">&#39;note_app/notes_by_tag.html&#39;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="n">tag</span><span class="p">,</span>
+                <span class="s1">&#39;page_obj&#39;</span><span class="p">:</span> <span class="n">page_obj</span><span class="p">,</span>
+                <span class="s2">&quot;top_tags&quot;</span><span class="p">:</span> <span class="n">top_tags</span><span class="p">,</span>
+                <span class="s1">&#39;notes_per_page&#39;</span><span class="p">:</span> <span class="n">notes_on_page</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="update_note_color">
+<a class="viewcode-back" href="../../notes.html#note_app.views.update_note_color">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_note_color</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">note_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update note color.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param note_id: ID of the note.</span>
+
+<span class="sd">    :return: Redirect back to previous page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">note</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">note_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="c1"># note = get_object_or_404(Note, id=note_id)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">note</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;You try to update not existing note.&quot;</span>
+            <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">color</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">color</span><span class="p">:</span>
+            <span class="n">note</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="n">note</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HTTP_REFERER&quot;</span><span class="p">,</span> <span class="s2">&quot;note_app:note-main&quot;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="delete_tag">
+<a class="viewcode-back" href="../../notes.html#note_app.views.delete_tag">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_tag</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tag_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete a tag if not used in any notes.</span>
+
+<span class="sd">    :param request: Django HTTP request object.</span>
+<span class="sd">    :param tag_id: ID of the tag.</span>
+
+<span class="sd">    :return: Redirect to tags page or error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">tag_id</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tag with id=</span><span class="si">{</span><span class="n">tag_id</span><span class="si">}</span><span class="s2"> not found or not yours.&quot;</span>
+        <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="c1"># Перевірка: чи прив&#39;язаний тег до нотаток</span>
+    <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">note_set</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Cannot delete tag &#39;</span><span class="si">{</span><span class="n">tag</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; because it is used in notes.&quot;</span>
+        <span class="k">return</span> <span class="n">redirect_to_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Якщо тег не використовується — видаляємо</span>
+    <span class="n">tag</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;note_app:note-tag&#39;</span><span class="p">)</span>  <span class="c1"># повертаємось на сторінку тегів</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Personal_Assistant 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">note_app.views</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Go IT group #6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
