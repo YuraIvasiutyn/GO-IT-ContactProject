@@ -26,7 +26,7 @@ class ContactTests(TestCase):
 
     def test_add_contact_missing_required_fields(self):
         data = {
-            # 'full_name' відсутній
+            # 'full_name'
             'email': 'ivan@example.com',
             'phone': '+38 (123) 456-78-90',
             'address': 'Address',
@@ -43,7 +43,7 @@ class ContactTests(TestCase):
         data = {
             'full_name': 'Ivan Ivanov',
             'email': 'ivan@example.com',
-            'phone': '1234567890',  # некоректний формат
+            'phone': '1234567890',
             'address': 'Address',
             'birthday': '1990-01-01',
         }
@@ -56,7 +56,7 @@ class ContactTests(TestCase):
                          "Phone number must be entered in the format: '+38 (XXX) XXX-XX-XX'. Up to 15 digits allowed.")
 
     def test_pagination_on_main_view(self):
-        for i in range(16):  # Змінив з 15 на 16
+        for i in range(16):
             Contact.objects.create(
                 user=self.user,
                 full_name=f'User {i}',
@@ -72,7 +72,7 @@ class ContactTests(TestCase):
 
         response = self.client.get(reverse('contact_app:main') + '?page=2')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['contacts']), 6)  # Тепер буде 6 (16 - 10)
+        self.assertEqual(len(response.context['contacts']), 6)
 
     def test_filter_contacts_by_days_to_birthday(self):
         today = date.today()
@@ -143,7 +143,7 @@ class ContactViewsTests(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
 
-        # Отримуємо оновлений контакт з бази даних
+
         updated_contact = Contact.objects.get(id=self.contact.id)
         self.assertEqual(updated_contact.full_name, 'Updated User')
         self.assertEqual(updated_contact.email, 'updated@example.com')
