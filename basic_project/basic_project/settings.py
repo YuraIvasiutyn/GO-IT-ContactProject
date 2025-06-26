@@ -139,6 +139,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # важливо для Render
 STATICFILES_DIRS = [
     BASE_DIR / "static/",
     BASE_DIR / "note_app/static/note_app/",
+    BASE_DIR / "docs/_build/html",
 ]
 
 # Default primary key field type
