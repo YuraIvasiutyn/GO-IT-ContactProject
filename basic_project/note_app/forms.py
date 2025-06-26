@@ -5,6 +5,12 @@ from .models import Tag, Note
 
 
 class TagForm(ModelForm):
+    """
+    Form for creating or updating a tag.
+
+    Fields:
+        - name (CharField): The name of the tag. Required. Max length 50.
+    """
     name = CharField(
         min_length=1,
         max_length=50,
@@ -18,6 +24,13 @@ class TagForm(ModelForm):
 
 
 class NoteForm(ModelForm):
+    """
+    Form for creating or editing a note.
+
+    Fields:
+        - note_title (CharField): The title of the note. Required. Max length 500.
+        - note (CharField): The content of the note. Optional. Max length 5000.
+    """
     note_title = CharField(
         min_length=1,
         max_length=500,

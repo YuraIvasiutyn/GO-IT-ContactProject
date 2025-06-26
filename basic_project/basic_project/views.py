@@ -5,25 +5,20 @@ def main(request):
     return render(request, 'index.html')
 
 
-def error(response, message):
+def error(request, message, status=404):
     return render(
-        response,
+        request,
         'error.html',
         {
             'message': message
-        }
+        },
+        status=status,
     )
 
-# ------------------------------------------------------------------------
-# лише на час розробки потім прибрати - це мій ІД
-# from django.contrib.auth import login
-# from django.contrib.auth import get_user_model
-# User = get_user_model()
-# ID = 4
-# def dev_login(request):
-#   if not request.user.is_authenticated:
-#        dev_user = User.objects.get(username="viktor")  # або твій логін
-#        dev_user.backend = 'django.contrib.auth.backends.ModelBackend'
-#        login(request, dev_user)
-#    return redirect('note_app:note-main')
-# ------------------------------------------------------------------------
+
+def custom_404(request, exception):
+    return error(request, "⛔ Page not found (404)")
+
+
+def custom_500(request):
+    return error("💥 Server error (500)")

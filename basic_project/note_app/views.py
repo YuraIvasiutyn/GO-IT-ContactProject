@@ -1,3 +1,27 @@
+"""
+Views for the Notes application.
+
+This module provides view functions for managing notes and tags, including:
+- creating, editing, and deleting notes and tags
+- displaying notes with pagination and tag filters
+- assigning colors to notes
+- calculating top used tags with font size scaling
+
+Functions:
+----------
+- redirect_to_error
+- count_top_tags
+- get_notes_on_page
+- main
+- tag
+- edit_tag
+- note
+- note_detail
+- note_delete
+- search_by_tag
+- update_note_color
+- delete_tag
+"""
 from django.shortcuts import render, redirect  # , get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -16,14 +40,32 @@ preset_colors = [
 
 
 def redirect_to_error(request, message):
+    """
+    Redirect to the generic error page with a custom message.
+
+    :param request: Django HTTP request object.
+    :param message: Error message to display.
+    :return: Rendered error template.
+    """
     return render(request, 'error.html', {'message': message})
 
 
-def count_top_tags(number_of_tags=10, min_font_size=10, max_font_size=28):
+def count_top_tags(user, number_of_tags=10, min_font_size=10, max_font_size=28):
+    """
+    Count and return top tags used by the user with dynamic font sizes.
+
+    :param user: The user whose tags should be analyzed.
+    :param number_of_tags: Number of top tags to retrieve. Default = 10.
+    :param min_font_size: Minimum font size. Default = 10
+    :param max_font_size: Maximum font size. Default = 28
+
+    :return: List of top Tag objects with font_size attribute.
+    """
     # Отримуємо топ-10 тегів за кількістю використань
-    top_tags = Tag.objects.annotate(cnt=Count('note'))\
-        .order_by('-cnt')[:number_of_tags]
-    # print(f"top tags: {top_tags}")
+    top_tags = Tag.objects.annotate(
+        # cnt=Count('note')
+        cnt=Count('note', filter=Q(note__user=user))
+        ).filter(user=user).order_by('-cnt')[:number_of_tags]
     # Визначаємо мінімальне та максимальне значення використання
     if top_tags:
         max_val = max(tag.cnt for tag in top_tags)
@@ -48,19 +90,31 @@ def count_top_tags(number_of_tags=10, min_font_size=10, max_font_size=28):
 
 
 def get_notes_on_page(request) -> int:
+    """
+    Get number of notes per page from GET parameter.
+
+    :param request: Django HTTP request object.
+    :return: Integer number of notes per page (default is 5).
+    """
     # Отримуємо кількість notes на сторінку з параметра GET
     # за замовчуванням 5
     notes_per_page = request.GET.get('notes_per_page', 5)
     try:
         notes_per_page = int(notes_per_page)
     except (ValueError, TypeError):
-        # Якщо значення некоректне, використовуємо 10
-        notes_per_page = 10  # Якщо значення некоректне, використовуємо 10
+        # Якщо значення некоректне, використовуємо 5
+        notes_per_page = 5  # Якщо значення некоректне, використовуємо 5
     return notes_per_page
 
 
-# Create your views here.
+@login_required
 def main(request):
+    """
+    Display main notes dashboard with pagination, sorting and search support.
+
+    :param request: Django HTTP request object.
+    :return: Rendered index template with notes and tag cloud.
+    """
     search_query = request.GET.get("search", "")
     notes_on_page = get_notes_on_page(request)
     sort_order = request.GET.get("sort", "")
@@ -79,7 +133,7 @@ def main(request):
         notes = notes.order_by("-note_title")
 
     # Отримуємо топ-10 тегів за кількістю використань
-    top_tags = count_top_tags()
+    top_tags = count_top_tags(request.user)
 
     # Отримуємо всі notes, які належать користувачу
     if len(notes) <= notes_on_page:
@@ -118,6 +172,12 @@ def main(request):
 @login_required
 # створення тегу
 def tag(request):
+    """
+    Create new tag or show form for creating tag.
+
+    :param request: Django HTTP request object.
+    :return: Rendered tag creation template.
+    """
     my_tags = Tag.objects.filter(user=request.user).all().order_by("id")
 
     if request.method == 'POST':
@@ -151,6 +211,13 @@ def tag(request):
 
 @login_required
 def edit_tag(request, tag_id):
+    """
+    Edit existing tag belonging to current user.
+
+    :param request: Django HTTP request object.
+    :param tag_id: ID of the tag to be edited.
+    :return: Rendered tag edit template or redirect.
+    """
     tag = Tag.objects.filter(pk=tag_id, user=request.user).first()
     if not tag:
         msg = f"Tag with id={tag_id} not found or not yours."
@@ -178,6 +245,14 @@ def edit_tag(request, tag_id):
 
 @login_required
 def note(request, note_id=None):
+    """
+    Create or edit a note.
+
+    :param request: Django HTTP request object.
+    :param note_id: Optional ID of the note to edit.
+
+    :return: Rendered note creation/edit template or redirect.
+    """
     tags = Tag.objects.filter(user=request.user).all()
     note = None
     form = None
@@ -248,6 +323,14 @@ def note(request, note_id=None):
 
 @login_required
 def note_detail(request, note_id):
+    """
+    View note details.
+
+    :param request: Django HTTP request object.
+    :param note_id: ID of the note.
+
+    :return: Rendered detail template or error.
+    """
     # note = get_object_or_404(Note, pk=note_id)
     note = Note.objects.filter(pk=note_id, user=request.user).first()
     if not note or note.user != request.user:
@@ -260,6 +343,14 @@ def note_detail(request, note_id):
 
 @login_required
 def note_delete(request, note_id):
+    """
+    Delete a note if it belongs to the current user.
+
+    :param request: Django HTTP request object.
+    :param note_id: ID of the note.
+
+    :return: Redirect or error.
+    """
     n = Note.objects.filter(
         pk=note_id,
         user=request.user
@@ -279,6 +370,14 @@ def note_delete(request, note_id):
 
 @login_required
 def search_by_tag(request, tag_name):
+    """
+    Search notes by tag for current user.
+
+    :param request: Django HTTP request object.
+    :param tag_name: Name of the tag.
+
+    :return: Rendered tag-filtered notes template.
+    """
     notes_on_page = get_notes_on_page(request)
     # tag = get_object_or_404(Tag, name=tag_name)
     tag = Tag.objects.filter(user=request.user, name=tag_name).first()
@@ -288,7 +387,7 @@ def search_by_tag(request, tag_name):
     notes = Note.objects.filter(user=request.user, tags=tag).all()
 
     # Отримуємо топ-10 тегів за кількістю використань
-    top_tags = count_top_tags()
+    top_tags = count_top_tags(request.user)
 
     if len(notes) <= notes_on_page:
         return render(
@@ -323,6 +422,14 @@ def search_by_tag(request, tag_name):
 
 @login_required
 def update_note_color(request, note_id):
+    """
+    Update note color.
+
+    :param request: Django HTTP request object.
+    :param note_id: ID of the note.
+
+    :return: Redirect back to previous page.
+    """
     if request.method == "POST":
         note = Note.objects.filter(user=request.user, id=note_id).first()
         # note = get_object_or_404(Note, id=note_id)
@@ -339,6 +446,14 @@ def update_note_color(request, note_id):
 
 @login_required
 def delete_tag(request, tag_id):
+    """
+    Delete a tag if not used in any notes.
+
+    :param request: Django HTTP request object.
+    :param tag_id: ID of the tag.
+
+    :return: Redirect to tags page or error.
+    """
     tag = Tag.objects.filter(pk=tag_id, user=request.user).first()
     if not tag:
         msg = f"Tag with id={tag_id} not found or not yours."

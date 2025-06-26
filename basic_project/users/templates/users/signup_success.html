@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center">
+        <h2 class="mb-4 text-success">✅ Registration Successful!</h2>
+        <p class="lead">Please check your email to activate your account.</p>
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a href="{% url 'main' %}" class="btn btn-outline-primary">🏠 Back to Home</a>
+            <a href="{% url 'users:login' %}" class="btn btn-primary">🔐 Go to Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

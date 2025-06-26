@@ -1,0 +1,11 @@
+Users Module
+===============
+
+
+Overview
+--------
+This section documents all parts of the **Users** module in the Personal Assistant application.
+
+.. contents::
+   :depth: 2
+   :local:
