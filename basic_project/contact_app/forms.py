@@ -1,18 +1,16 @@
 from django.forms import Form, ModelForm, NumberInput, IntegerField, CharField, EmailField, DateField, TextInput, \
-    EmailInput, \
-    DateInput
-
+    EmailInput, DateInput
 from .models import Contact
 
 
 class QueryForm(Form):
-    query = CharField(
+    query: CharField = CharField(
         max_length=100, required=False, label='Search',
         widget=TextInput(attrs={
             'class': 'form-control', 'placeholder': 'Search', 'id': 'query'
         })
     )
-    days = IntegerField(
+    days: IntegerField = IntegerField(
         required=False, min_value=0, max_value=365, label='Days to birthday',
         widget=NumberInput(attrs={
             'class': 'form-control', 'placeholder': '365', 'type': 'number', 'id': 'days'
@@ -25,7 +23,7 @@ class QueryForm(Form):
 
 
 class AddContactForm(ModelForm):
-    full_name = CharField(
+    full_name: CharField = CharField(
         max_length=100, min_length=4, required=True, label='Full name', help_text='Enter full name',
         error_messages={
             'required': 'This field is required',
@@ -35,25 +33,25 @@ class AddContactForm(ModelForm):
             'class': 'form-control', 'type': 'text', 'placeholder': 'Enter full name', 'id': 'full_name'
         })
     )
-    address = CharField(
+    address: CharField = CharField(
         max_length=200, required=True, label='Address', help_text='Enter address',
         widget=TextInput(attrs={
             'class': 'form-control', 'type': 'text', 'placeholder': 'Enter address', 'id': 'address'
         })
     )
-    email = EmailField(
+    email: EmailField = EmailField(
         required=True, label='Email', help_text='Enter email',
         widget=EmailInput(attrs={
             'class': 'form-control', 'type': 'email', 'placeholder': 'Enter email', 'id': 'email'
         })
     )
-    phone = CharField(
+    phone: CharField = CharField(
         max_length=20, required=True, label='Phone', help_text='Enter phone',
         widget=TextInput(attrs={
             'class': 'form-control', 'type': 'tel', 'placeholder': '+38 (xxx) xxx-xx-xx', 'id': 'phone'
         })
     )
-    birthday = DateField(
+    birthday: DateField = DateField(
         required=True, label='Birthday', help_text='Enter birthday',
         widget=DateInput(attrs={
             'class': 'form-control', 'type': 'date', 'placeholder': 'Enter birthday', 'id': 'birthday'
