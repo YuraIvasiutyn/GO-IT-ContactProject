@@ -27,8 +27,8 @@ class RegisterForm(UserCreationForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirm = cleaned_data.get("password_confirm")
+        password = cleaned_data.get("password1")
+        confirm = cleaned_data.get("password2")
         if password and confirm and password != confirm:
             raise forms.ValidationError("Passwords do not match.")
         return cleaned_data
@@ -51,6 +51,9 @@ class SetNewPasswordForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data['new_password'] != cleaned_data['confirm_password']:
+        pass1 = cleaned_data['new_password']
+        pass2 = cleaned_data['confirm_password']
+        if pass1 and pass2 and pass1 != pass2:
             raise forms.ValidationError("Passwords do not match.")
+
         return cleaned_data
