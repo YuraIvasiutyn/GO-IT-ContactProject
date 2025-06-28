@@ -1,7 +1,8 @@
 from django.forms import ModelForm, CharField, TextInput, Textarea
 #  , DateField, DateInput, HiddenInput, IntegerField
+from django import forms
+
 from .models import Tag, Note
-# from django import forms
 
 
 class TagForm(ModelForm):
@@ -21,6 +22,17 @@ class TagForm(ModelForm):
     class Meta:
         model = Tag
         fields = ['name']
+
+    def __init__(self, *args, **kwargs):
+        # self.user = user
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        if Tag.objects.filter(name__iexact=name, user=self.user).exists():
+            raise forms.ValidationError("You already have a tag with this name.")
+        return name
 
 
 class NoteForm(ModelForm):

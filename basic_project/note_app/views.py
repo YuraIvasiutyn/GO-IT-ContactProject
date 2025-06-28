@@ -181,7 +181,7 @@ def tag(request):
     my_tags = Tag.objects.filter(user=request.user).all().order_by("id")
 
     if request.method == 'POST':
-        form = TagForm(request.POST)
+        form = TagForm(request.POST, user=request.user)
         if form.is_valid():
             tag = form.save(commit=False)
             tag.user = request.user
@@ -203,7 +203,7 @@ def tag(request):
         request,
         'note_app/tag.html',
         {
-            'form': TagForm(),
+            'form': TagForm(user=request.user),
             'tags': my_tags,
         }
     )
@@ -224,12 +224,12 @@ def edit_tag(request, tag_id):
         return redirect_to_error(request, msg)
 
     if request.method == 'POST':
-        form = TagForm(request.POST, instance=tag)
+        form = TagForm(request.POST, instance=tag, user=request.user)
         if form.is_valid():
             form.save()
             return redirect('note_app:note-tag')
     else:
-        form = TagForm(instance=tag)
+        form = TagForm(instance=tag, user=request.user)
 
     my_tags = Tag.objects.filter(user=request.user).all().order_by("id")
     return render(
