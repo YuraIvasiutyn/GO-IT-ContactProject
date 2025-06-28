@@ -16,7 +16,7 @@ class Tag(models.Model):
     Methods:
         __str__(): Returns a human-readable string representation of the tag.
     """
-    name = models.CharField(max_length=50, null=False, unique=True)
+    name = models.CharField(max_length=50, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:

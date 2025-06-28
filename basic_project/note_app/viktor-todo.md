@@ -45,7 +45,7 @@
    + 4. створити нові таблиці модуля в БД
      ```cmd
      cd %GitHub%\go-it-contactproject\basic_prooject
-     python manage.py makemigrations  --name=note_app_1
+     python manage.py makemigrations  --name=note_app_remove_constraint
      python manage.py migrate
      ```
    + 5. зробити сучасну верстку своїх сторінок
