@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 
 class RegisterForm(UserCreationForm):
@@ -46,8 +48,14 @@ class PasswordResetRequestForm(forms.Form):
 
 
 class SetNewPasswordForm(forms.Form):
-    new_password = forms.CharField(widget=forms.PasswordInput, label="New Password")
-    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+    new_password = forms.CharField(
+        widget=forms.PasswordInput,
+        label="New Password"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput,
+        label="Confirm Password"
+    )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -55,5 +63,10 @@ class SetNewPasswordForm(forms.Form):
         pass2 = cleaned_data['confirm_password']
         if pass1 and pass2 and pass1 != pass2:
             raise forms.ValidationError("Passwords do not match.")
+        # Викликаємо стандартну перевірку Django, як при реєстрації
+        try:
+            validate_password(pass1)
+        except ValidationError as e:
+            self.add_error('new_password', e)
 
         return cleaned_data
