@@ -2,37 +2,32 @@ from typing import Optional
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator, MinLengthValidator, EmailValidator, MaxLengthValidator
+from django.core.validators import RegexValidator, MinLengthValidator, EmailValidator
 from datetime import date
-from . import messages
-from django.db.models.manager import Manager
 
 
 class Contact(models.Model):
-    objects = models.Manager()
     full_name: models.CharField = models.CharField(
         max_length=100,
         validators=[
-            MinLengthValidator(2, messages.ERROR_NAME_TOO_SHORT),
-            MaxLengthValidator(100, messages.ERROR_NAME_TOO_LONG)
+            MinLengthValidator(2, "Name must be at least 2 characters long")
         ]
     )
     address: models.CharField = models.CharField(
         max_length=200,
         validators=[
-            MinLengthValidator(5, messages.ERROR_ADDRESS_TOO_SHORT),
-            MaxLengthValidator(200, messages.ERROR_ADDRESS_TOO_LONG)
+            MinLengthValidator(5, "Address must be at least 5 characters long")
         ]
     )
     email: models.EmailField = models.EmailField(
-        validators=[EmailValidator(messages.INVALID_EMAIL)]
+        validators=[EmailValidator("Enter a valid email address")]
     )
     phone: models.CharField = models.CharField(
         max_length=20,
         validators=[
             RegexValidator(
                 regex=r'^\+38 \(\d{3}\) \d{3}-\d{2}-\d{2}$',
-                message=messages.INVALID_PHONE_FORMAT
+                message="Phone number must be entered in the format: '+38 (XXX) XXX-XX-XX'. Up to 15 digits allowed."
             )
         ]
     )
@@ -44,9 +39,9 @@ class Contact(models.Model):
         related_name='contacts'
     )
 
-    def clean(self):
-        if self.birthday is not None and self.birthday > date.today():
-            raise ValidationError({'birthday': messages.BIRTHDAY_IN_FUTURE})
+    def clean(self) -> None:
+        if self.birthday > date.today():
+            raise ValidationError({'birthday': 'Birthday cannot be in the future'})
 
     def __str__(self) -> str:
-        return self.full_name if self.full_name is not None else ''
+        return self.full_name
